@@ -1,0 +1,12 @@
+{
+  "extends": "./typescript/tsconfig.json",
+  "exclude": ["lib"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "rootDir": "src",
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src/**/*.ts"]
+}

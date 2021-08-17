@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+.history
+# build and test
+build/
+dist/
+lib/
+types/
+
+# logs
+yarn-error.log
+npm-debug.log
+
+# ide
+.idea
+*.sublime-*
+
+# misc
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+.rpt2_cache
+
+# eslint
+.eslintcache
+eslintcache/*
+
+# vscode
+.vscode
+.history
+.history/*
+# node version
+.node-version
+
