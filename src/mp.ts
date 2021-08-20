@@ -1,11 +1,4 @@
-declare var wx: object; // 微信小程序
-declare var swan: object; // 百度小程序
-declare var tt: object; // 头条小程序
-declare var my: object; // 支付宝小程序
-declare var qq: object; // QQ小程序
-declare var qh: object; // 360小程序
-
-declare var getCurrentPages: (message?: any) => Array<any>;
+import { TSystemInfo, TUserInfo, TNetworkInfo, TSceneInfo } from './types/mp';
 
 /**
  * 应用级事件 基础库>2.1.2
@@ -19,149 +12,121 @@ declare var getCurrentPages: (message?: any) => Array<any>;
 export const APP_LIFE_CYCLE = ['onLaunch', 'onShow'];
 export const PAGE_LIFE_CYCLE = ['onLoad', 'onShow', 'onReady', 'onHide'];
 
-// @ts-ignore
-let mp: MP = null;
+let mp: MP;
 export default class MP {
-  private context: any;
-  private appName: any;
-  private systemInfo: any;
-  private userInfo: any;
-  private network: any;
-  private scene: any;
-  private indexPage: string;
+  private _context!: IContext;
+  private _appName!: string;
+  private _systemInfo!: TSystemInfo; //系统信息
+  private _userInfo!: TUserInfo; //用户信息
+  private _networkInfo!: TNetworkInfo; //网络信息
+  private _sceneInfo!: TSceneInfo; //场景信息
+  private _indexPage!: string;
 
-  constructor() {
-    this.context = null;
-    this.appName = null;
-    this.network = null;
-    this.systemInfo = null;
-    this.userInfo = null;
-    this.scene = {};
-    this.indexPage = 'unknown';
-    this.getContext();
-    this.getAppName();
-    this.getSystemInfo();
-    this.getUserInfo();
-    this.getNetworkInfo();
-  }
+  constructor() { }
 
-  public getContext() {
-    if (this.context) return this.context;
+  public get context() {
+    if (this._context) return this._context;
 
     if (typeof wx !== 'undefined') {
-      this.context = wx;
+      this._context = wx;
     }
     if (typeof swan !== 'undefined') {
-      this.context = swan;
+      this._context = swan;
     }
     if (typeof tt !== 'undefined') {
-      this.context = tt;
+      this._context = tt;
     }
     if (typeof my !== 'undefined') {
-      this.context = my;
+      this._context = my;
     }
     if (typeof qq !== 'undefined') {
-      this.context = qq;
+      this._context = qq;
     }
     if (typeof qh !== 'undefined') {
-      this.context = qh;
+      this._context = qh;
     }
+
+    return this._context;
   }
 
-  public getAppName() {
-    if (this.appName) return this.appName;
+  public get appName() {
+    if (this._appName) return this._appName;
 
     if (typeof wx !== 'undefined') {
-      this.appName = 'wx';
+      this._appName = 'wx';
     }
     if (typeof swan !== 'undefined') {
-      this.appName = 'swan';
+      this._appName = 'swan';
     }
     if (typeof tt !== 'undefined') {
-      this.appName = 'tt';
+      this._appName = 'tt';
     }
     if (typeof my !== 'undefined') {
-      this.appName = 'my';
+      this._appName = 'my';
     }
     if (typeof qq !== 'undefined') {
-      this.appName = 'qq';
+      this._appName = 'qq';
     }
     if (typeof qh !== 'undefined') {
-      this.appName = 'qh';
+      this._appName = 'qh';
     }
+
+    return this._appName;
   }
 
-  /**
-   * 获取页面层级页面路径
-   * @returns
-   */
-  public getCurrentPages() {
-    try {
-      if (typeof getCurrentPages === 'function') {
-        const pages = getCurrentPages();
-        console.log(pages);
-        return pages[pages.length - 1].route;
-      }
-      console.warn('getCurrentPages is not function in global');
-      return 'unknow';
-    } catch (error) {
-      return 'unknow';
-    }
+  public get systemInfo() {
+    if (this._systemInfo) return this._systemInfo;
+
+    this._systemInfo = this._context.getSystemInfoSync();
+    return this._systemInfo;
   }
 
-  /**
-   * 获取系统信息
-   */
-  public getSystemInfo() {
-    if (this.systemInfo) return this.systemInfo;
-
-    this.systemInfo = this.context.getSystemInfoSync();
-    return this.systemInfo;
-  }
-
-  /**
-   * 获取用户信息
-   */
-  public getUserInfo() {
-    if (this.userInfo) return this.userInfo;
+  public get userInfo() {
     let self = this;
-    this.context.getUserInfo({
-      success: function (res: any) {
-        self.userInfo = res.userInfo || {};
+    if (this._userInfo) return this._userInfo;
+    this._context.getUserInfo({
+      success: function (res: { userInfo: TUserInfo }) {
+        self._userInfo = res.userInfo || {};
       }
     });
+    return;
   }
 
-  /**
-   * 获取网络信息
-   */
-  public getNetworkInfo() {
+  public get networkInfo() {
     let self = this;
-    if (this.network) return this.network;
-    this.context.getNetworkType({
-      success: function (res: any) {
-        self.network = {
-          signalStrength: res.signalStrength, //信号强弱
-          networkType: res.networkType //网络类型
+    if (this._networkInfo) return this._networkInfo;
+    this._context.getNetworkType({
+      success: function (res: TNetworkInfo) {
+        self._networkInfo = {
+          signalStrength: res.signalStrength,
+          networkType: res.networkType
         };
       }
     });
+    return;
   }
 
-  public setIndexPage(path: string) {
-    this.indexPage = path;
+  public get sceneInfo() {
+    return this._sceneInfo;
+  }
+  public set sceneInfo(sceneInfo: TSceneInfo) {
+    this._sceneInfo = sceneInfo;
   }
 
-  public getIndexPage() {
-    return this.indexPage;
+  public get indexPage() {
+    return this._indexPage;
+  }
+  public set indexPage(indexPage: string) {
+    this._indexPage = indexPage;
   }
 
-  public setScene(scene: any) {
-    this.scene = scene;
-  }
-
-  public getScene() {
-    return this.scene;
+  public get currentPage() {
+    let pages = getCurrentPages();
+    if (pages.length > 0) {
+      return pages[pages.length - 1].route;
+    } else {
+      return this._indexPage;
+    }
   }
 
   static instance(): MP {

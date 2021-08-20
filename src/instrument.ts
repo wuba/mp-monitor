@@ -19,7 +19,7 @@ const instrumented: { [key in InstrumentHandlerType]?: boolean } = {};
 
 /** Instruments given API */
 function instrument(type: InstrumentHandlerType): void {
-  const ctx = MP.instance().getContext();
+  const ctx = MP.instance().context;
 
   if (instrumented[type]) {
     return;

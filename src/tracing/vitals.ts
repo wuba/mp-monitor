@@ -48,9 +48,10 @@ export class MPVitals {
       APP_LIFE_CYCLE.forEach(name => {
         const primaryHookFn = obj[name];
         obj[name] = function (info: any) {
-          if (mpInstance.getIndexPage() == 'unknown') {
-            mpInstance.setIndexPage(info.path);
-            mpInstance.getUserInfo();
+          if (!mpInstance.indexPage) {
+            mpInstance.indexPage = info.path;
+            mpInstance.networkInfo;
+            mpInstance.userInfo;
           }
           let date = Date.now() || new Date().getTime();
           console.log(`App：${name}_${date}`)
@@ -60,7 +61,7 @@ export class MPVitals {
               layoutTime: date,
               extra: { name: '初始化耗时', scene: info.scene }
             }
-            mpInstance.setScene(info);
+            mpInstance.sceneInfo = info;
           }
           if (name === 'onShow') {
             self.__TIMELINE__['Page_init'] = date;

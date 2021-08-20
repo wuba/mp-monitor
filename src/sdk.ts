@@ -22,7 +22,7 @@ const defaultIntegrations = [
 /**
  * Beidou初始化调用处理
  */
-export function init(options: MiniProgramOptions = {}): void {
+export function init(options: MiniProgramOptions = { url: '' }): void {
   options.isDebug = true;
   options.isProd = true;
 

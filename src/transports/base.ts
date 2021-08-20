@@ -1,21 +1,17 @@
-import { Event, Response, Transport, utils } from '../shared';
+import { Event, Response, Transport, utils, core } from '../shared';
 
 const {
   PromiseBuffer, BeidouError,
 } = utils;
-
-enum reportUrl {
-  COMMON_REPORT_URL = 'https://tzjybeidou.58.com/collect/weapp/common',
-  // BREADCRUMB_REPORT_URL = 'https://tzjybeidou.58.com/collect/behavior',
-}
+const { getCurrentHub } = core;
 
 /** Base Transport class implementation */
 export abstract class BaseTransport implements Transport {
-  /**
-   * @deprecated
-   */
-  public url: string = '';
 
+  /**
+ * @deprecated
+ */
+  public url: string = '';
   /** A simple buffer holding all requests. */
   protected readonly _buffer: utils.PromiseBuffer<Response> = new PromiseBuffer(30);
 
@@ -23,20 +19,17 @@ export abstract class BaseTransport implements Transport {
    * @description 返回上报接口链接
    * @returns string
    */
-  public _getReportUrl(event: Event): string {
-    const { type = '' } = event;
-    let REPORT_URL = '';
-
-    switch (type) {
-      case 'breadcrumb':
-        // REPORT_URL = reportUrl.BREADCRUMB_REPORT_URL;
-        break;
-      default:
-        REPORT_URL = reportUrl.COMMON_REPORT_URL;
-        break;
-    }
-
-    return `${REPORT_URL}`;
+  public _getReportUrl(): string {
+    let client = getCurrentHub().getClient() || {
+      getOptions() {
+        return {
+          projectId: '',
+          url: ''
+        }
+      }
+    };
+    const { url } = client.getOptions();
+    return url;
   }
 
   /**

@@ -19,9 +19,9 @@ export class RequestTransport extends BaseTransport {
     }
 
     const content: object = this.finalFomartData(event);
-    const ctx = MP.instance().getContext();
+    const ctx = MP.instance().context;
 
-    this.url = this._getReportUrl(event);
+    this.url = this._getReportUrl();
 
     return this._buffer.add(
       new Promise<Response>((resolve, reject) => {

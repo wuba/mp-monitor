@@ -57,30 +57,31 @@ export class Common implements Integration {
           version: SDK_VERSION,
         };
         let mpInstance = MP.instance();
-        const appInfo: any = mpInstance.getSystemInfo();
-        const network: any = mpInstance.getNetworkInfo() || {};
-        const sceneInfo: any = mpInstance.getScene();
+        const systemInfo: any = mpInstance.systemInfo || '';
+        const networkInfo: any = mpInstance.networkInfo || '';
+        const sceneInfo: any = mpInstance.sceneInfo || '';
+        const userInfo: any = mpInstance.userInfo || '';
         event.request = {
-          url: mpInstance.getCurrentPages() || mpInstance.getIndexPage(),
+          url: mpInstance.currentPage,
           headers: {
-            appName: mpInstance.getAppName(),
-            appVersion: appInfo.version, //微信版本号
-            appSDKVersion: appInfo.SDKVersion, //客户端基础库版本
+            appName: mpInstance.appName,
+            appVersion: systemInfo.version, //微信版本号
+            appSDKVersion: systemInfo.SDKVersion, //客户端基础库版本
             imei: singleUUID(),
             uuid: singleUUID(),
             pid: singleUUID(),
-            os: appInfo.system.split(' ')[0], //操作系统
-            osv: appInfo.system.split(' ')[1], //操作系统版本
-            device: appInfo.model, //设备型号
-            brand: appInfo.brand, //设备品牌
-            benchmarkLevel: appInfo.benchmarkLevel, //设备性能等级（仅Android）
-            host: appInfo.host, //当前小程序运行的宿主环境
-            apn: network.networkType,
-            scene: sceneInfo.scene, //场景值
-            systemInfo: appInfo, //系统信息
-            userInfo: mpInstance.getUserInfo() || {}, //用户信息
-            networkInfo: network || {}, //网络信息
-            sceneInfo: sceneInfo,
+            os: systemInfo.system.split(' ')[0], //操作系统
+            osv: systemInfo.system.split(' ')[1], //操作系统版本
+            device: systemInfo.model, //设备型号
+            brand: systemInfo.brand, //设备品牌
+            benchmarkLevel: systemInfo.benchmarkLevel, //设备性能等级（仅Android）
+            host: systemInfo.host, //当前小程序运行的宿主环境
+            apn: networkInfo !== '' ? networkInfo.networkType : '',
+            scene: sceneInfo !== '' ? sceneInfo.scene : '', //场景值
+            systemInfo: encodeURIComponent(JSON.stringify(systemInfo)), //系统信息
+            userInfo: encodeURIComponent(JSON.stringify(userInfo)), //用户信息
+            networkInfo: encodeURIComponent(JSON.stringify(networkInfo)), //网络信息
+            sceneInfo: encodeURIComponent(JSON.stringify(sceneInfo)),
           },
         };
         event.apis && (event.apis = parseData<API>(event.apis));

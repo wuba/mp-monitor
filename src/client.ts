@@ -7,7 +7,7 @@ export class MiniProgramClient extends core.BaseClient<MiniProgramBackend, MiniP
    *
    * @param options ReactNativeOptions
    */
-  public constructor(options: MiniProgramOptions = {}) {
+  public constructor(options: MiniProgramOptions = { url: '' }) {
     super(MiniProgramBackend, options);
   }
 }
