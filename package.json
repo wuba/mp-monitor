@@ -9,7 +9,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:min": "npx rollup --config",
     "build": "run-s build:cjs build:min",
-    "publish:mp": "yarn && yarn run build && npm publish",
+    "publish": "yarn && yarn run build && npm publish",
     "start": "run-p build-w",
     "lint-w": "esw src --clear -w --ext .ts",
     "build-w": "tsc -w --inlineSourceMap",
