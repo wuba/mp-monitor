@@ -30,6 +30,10 @@ eslintcache/*
 .vscode
 .history
 .history/*
+
 # node version
 .node-version
+
+package-lock.json
+yarn.lock
 
