@@ -13,3 +13,4 @@ declare var qq: IContext; // QQ小程序
 declare var qh: IContext; // 360小程序
 
 declare var getCurrentPages: (message?: any) => Array<any>;
+declare var $router: any; //360小程序路由

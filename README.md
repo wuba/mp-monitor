@@ -18,7 +18,7 @@ mpMonitor.init({
 
 2. 单文件形式使用
 
-> 原生小程序开发，建议将 mp_monitor 包dist目录下 mp_monitor.min.js 拷贝到项目目录下直接使用
+> 原生小程序开发，建议将 mp_monitor 包dist目录下 [mp_monitor.min.js](https://github.com/BubbleM/mp_monitor/blob/main/dist/mp_monitor.min.js) 拷贝到项目目录下直接使用
 
 ```js
 const mpMonitor = require('./utils/mp-monitor');

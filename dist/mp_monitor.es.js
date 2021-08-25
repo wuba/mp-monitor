@@ -3075,6 +3075,11 @@ var MP = function () {
   });
   Object.defineProperty(MP.prototype, "currentPage", {
     get: function get() {
+      if (this.appName === 'qh') {
+        var path = $router.history.current.path;
+        return path;
+      }
+
       var pages = getCurrentPages();
 
       if (pages.length > 0) {
@@ -4168,21 +4173,51 @@ var GlobalHandlers = function () {
       return;
     }
 
+    var mp = MP.instance();
     addInstrumentationHandler({
       callback: function callback(args) {
         if (args === void 0) {
           args = [''];
         }
 
-        var _a = args[0],
-            _b = _a.name,
-            name = _b === void 0 ? 'jsexec' : _b,
-            _c = _a.message,
-            message = _c === void 0 ? '' : _c,
-            stack = _a.stack;
+        var content = '',
+            stack,
+            errType = '';
+        var ERROR_TYPES_REG = /(((Eval|Reference|Range|Internal|Type|Syntax)Error)|promise)/;
+
+        if (mp.appName === 'swan' && Object.prototype.toString.call(args[0]) === '[object String]') {
+          var errDate = args[0].replace(/\n/g, ">>").split('>>');
+          content = errDate[1];
+          errType = errDate.splice(0, 4).join('').match(ERROR_TYPES_REG)[0];
+        } else {
+          for (var i = 0; i < 3; i++) {
+            if (args[i]) {
+              if (Object.prototype.toString.call(args[i]) === '[object Error]') {
+                errType = args[i].name;
+                content = args[i].message.replace(/\n/g, " ");
+                stack = args[i].stack;
+                break;
+              } else {
+                content += args[i].toString();
+              }
+            }
+          }
+
+          if (!errType) {
+            var matchType = content.match(ERROR_TYPES_REG);
+
+            if (matchType && matchType.length > 0) {
+              errType = matchType[0] === 'promise' ? 'UnhandledRejection' : matchType[0];
+            } else {
+              errType = 'Error';
+            }
+          }
+        }
+
         var exceptionVal = {
-          content: name + ": " + message,
-          stacktrace: stack
+          errType: errType,
+          content: errType + ": " + content,
+          stacktrace: stack || args[0]
         };
         var payload = {
           exceptions: [exceptionVal],

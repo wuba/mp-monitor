@@ -121,6 +121,10 @@ export default class MP {
   }
 
   public get currentPage() {
+    if (this.appName === 'qh') {
+      const { path } = $router.history.current;
+      return path;
+    }
     let pages = getCurrentPages();
     if (pages.length > 0) {
       return pages[pages.length - 1].route;
