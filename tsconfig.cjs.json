@@ -1,0 +1,12 @@
+{
+  "extends": "./typescript/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "module": "commonjs",
+    "sourceMap": false,
+    "inlineSources": false,
+    "declarationDir": "types",
+    "declarationMap": false
+  }
+}
