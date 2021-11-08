@@ -20,7 +20,7 @@ npm i mp-monitor --save
 
 - 下载资源引入
 
-> 原生小程序开发，建议将mp_monitor打包后dist目录下 `mp-monitor.min.js`拷贝到项目目录下直接使用。
+> 原生小程序开发，建议将mp-monitor打包后dist目录下 `mp-monitor.min.js`拷贝到项目目录下直接使用。
 
 ```js
 const mpMonitor = require('./vendor/mp-monitor.min.js');
@@ -126,8 +126,8 @@ mpMonitor.init({
     "type": "exception",
     "projectId": 1,
     "sdk": {
-        "name": "mp_monitor",
-        "version": "0.0.1"
+        "name": "mp-monitor",
+        "version": "1.0.0"
     }
 }
 ```
@@ -146,8 +146,8 @@ mpMonitor.init({
     "type": "api",
     "projectId": 1,
     "sdk": {
-        "name": "mp_monitor",
-        "version": "0.0.1"
+        "name": "mp-monitor",
+        "version": "1.0.0"
     }
 }
 ```
@@ -167,8 +167,8 @@ mpMonitor.init({
     "type": "resource",
     "projectId": 1,
     "sdk": {
-        "name": "mp_monitor",
-        "version": "0.0.1"
+        "name": "mp-monitor",
+        "version": "1.0.0"
     },
 }
 ```
@@ -209,8 +209,8 @@ mpMonitor.init({
     "type": "performance",
     "projectId": 1,
     "sdk": {
-        "name": "mp_monitor",
-        "version": "0.0.1"
+        "name": "mp-monitor",
+        "version": "1.0.0"
     },
     "request": {}
 }
