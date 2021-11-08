@@ -1,6 +1,6 @@
 {
   "name": "mp-monitor",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "小程序监控sdk",
   "main": "dist/mp-monitor.min.js",
   "module": "dist/mp-monitor.es.js",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BubbleM/mp_monitor.git"
+    "url": "git+https://github.com/wuba/mp-monitor.git"
   },
   "keywords": [
     "小程序、性能监控、异常监控、行为轨迹"

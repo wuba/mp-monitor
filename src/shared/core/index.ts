@@ -14,4 +14,5 @@ export { initAndBind, ClientClass } from './sdk';
 export { NoopTransport } from './transports/noop';
 
 import * as Integrations from './integrations';
+
 export { Integrations };

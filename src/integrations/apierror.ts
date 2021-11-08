@@ -1,7 +1,7 @@
-import { core, Event, Integration, utils } from '../shared';
-
 import { addInstrumentationHandler } from '../instrument';
+import { core, Event, Integration, utils } from '../shared';
 import { MPAPI } from '../types/api';
+
 const { uuid4, getGlobalObject, repeatCheck, isString } = utils;
 const { getCurrentHub } = core;
 const hub = getCurrentHub();

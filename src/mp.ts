@@ -1,4 +1,4 @@
-import { TSystemInfo, TUserInfo, TNetworkInfo, TSceneInfo } from './types/mp';
+import { TNetworkInfo, TPageParams, TSceneInfo, TSystemInfo, TUserInfo } from './types/mp';
 
 /**
  * 应用级事件 基础库>2.1.2
@@ -21,6 +21,7 @@ export default class MP {
   private _networkInfo!: TNetworkInfo; //网络信息
   private _sceneInfo!: TSceneInfo; //场景信息
   private _indexPage!: string;
+  private _pageParams!: TPageParams; //进入当前页面的query参数
 
   constructor() { }
 
@@ -131,6 +132,13 @@ export default class MP {
     } else {
       return this._indexPage;
     }
+  }
+
+  public get pageParams() {
+    return this._pageParams;
+  }
+  public set pageParams(data: TPageParams) {
+    this._pageParams = data;
   }
 
   static instance(): MP {

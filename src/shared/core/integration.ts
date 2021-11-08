@@ -1,5 +1,5 @@
-import { Integration, Options } from '../types';
 import { addGlobalEventProcessor, getCurrentHub } from '../hub';
+import { Integration, Options } from '../types';
 import { logger } from '../utils';
 
 export const installedIntegrations: string[] = [];

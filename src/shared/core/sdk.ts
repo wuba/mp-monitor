@@ -1,6 +1,6 @@
+import { getCurrentHub } from '../hub';
 import { Client, Options } from '../types';
 import { logger } from '../utils';
-import { getCurrentHub } from '../hub';
 
 export type ClientClass<F extends Client, O extends Options> = new (options: O) => F;
 

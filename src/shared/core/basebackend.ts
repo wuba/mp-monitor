@@ -1,6 +1,5 @@
 import { Event, EventHint, Options, Transport } from '../types';
-import { logger, BeidouError } from '../utils';
-
+import { BeidouError, logger } from '../utils';
 import { NoopTransport } from './transports/noop';
 
 export interface Backend {

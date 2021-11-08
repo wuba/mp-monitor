@@ -7,7 +7,7 @@
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
- import { getGlobalObject } from './misc';
+import { getGlobalObject } from './misc';
 
  const global = getGlobalObject();
 

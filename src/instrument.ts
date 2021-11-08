@@ -1,8 +1,8 @@
+import MP from './mp';
 /** *
  * @file Api重写注入
  */
 import { utils } from './shared';
-import MP from './mp';
 
 const { logger, getFunctionName, intercept } = utils;
 

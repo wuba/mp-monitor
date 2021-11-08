@@ -1,5 +1,7 @@
 import { Event, Exception, StackFrame, utils } from './shared';
-import { computeStackTrace, StackFrame as TraceKitStackFrame, StackTrace as TraceKitStackTrace } from './tracekit';
+import {
+    computeStackTrace, StackFrame as TraceKitStackFrame, StackTrace as TraceKitStackTrace
+} from './tracekit';
 
 const { extractExceptionKeysForMessage, isEvent, is } = utils;
 const STACKTRACE_LIMIT = 50;

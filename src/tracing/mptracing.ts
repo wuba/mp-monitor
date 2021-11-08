@@ -1,14 +1,9 @@
-import {
-  EventProcessor,
-  Integration,
-  TransactionContext,
-  SpanContext,
-  Span, reducer, utils
-} from "../shared";
-
-import { Transaction } from './transaction';
 import { DEFAULT_NAVIGATION_NAME } from '../constant';
-import { MPVitals } from "./vitals";
+import {
+    EventProcessor, Integration, reducer, Span, SpanContext, TransactionContext, utils
+} from '../shared';
+import { Transaction } from './transaction';
+import { MPVitals } from './vitals';
 
 /**
  * Tracing integration for React Native.

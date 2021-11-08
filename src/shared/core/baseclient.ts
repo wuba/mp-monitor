@@ -1,7 +1,9 @@
 /* eslint-disable max-lines */
 import { Scope } from '../hub';
-import { Client, Event, EventHint, Integration, IntegrationClass, Options, EventTypeEnum } from '../types';
-import { isThenable, logger, normalize, SyncPromise, truncate, isDevHref } from '../utils';
+import {
+    Client, Event, EventHint, EventTypeEnum, Integration, IntegrationClass, Options
+} from '../types';
+import { isDevHref, isThenable, logger, normalize, SyncPromise, truncate } from '../utils';
 import { Backend, BackendClass } from './basebackend';
 import { IntegrationIndex, setupIntegrations } from './integration';
 
@@ -54,7 +56,7 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
     return eventId;
   }
 
-  private _devEnvHandle () {
+  private _devEnvHandle() {
     if (isDevHref()) {
       logger.warn(`监控你在本地服务进行开发，不会进行北斗上报`);
       return true
@@ -64,10 +66,10 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
   }
 
   // 上报前策略处理
-  private _limitCount (event: Event): boolean {
-    
+  private _limitCount(event: Event): boolean {
+
     // 面包屑没有参与统计
-    if (event.type === 'breadcrumb') {
+    if (event.type === 'breadcrumb' || event.type === 'performance') {
       return true
     }
 
@@ -93,7 +95,7 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
         eventId = finalEvent && finalEvent.event_id;
         this._processing = false;
       })
-      /* @ts-ignore */ 
+      /* @ts-ignore */
       .then(null, reason => {
         // TODO: 去掉 logger
         // logger.error(reason);
@@ -268,7 +270,7 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
       this._getBackend().sendEvent(event);
     }
     if (this._isDebug()) {
-      logger.log('1',JSON.stringify(event));
+      logger.log('1', JSON.stringify(event));
     }
   }
 

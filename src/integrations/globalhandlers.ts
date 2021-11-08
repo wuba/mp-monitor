@@ -1,7 +1,7 @@
-import { core, Event, Integration } from '../shared';
-import { MPException } from '../types/expection';
 import { addInstrumentationHandler } from '../instrument';
 import MP from '../mp';
+import { core, Event, Integration } from '../shared';
+import { MPException } from '../types/expection';
 
 const { getCurrentHub } = core;
 const hub = getCurrentHub();

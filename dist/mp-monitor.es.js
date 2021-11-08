@@ -2430,7 +2430,7 @@ function () {
 
   BaseClient.prototype._limitCount = function (event) {
     // 面包屑没有参与统计
-    if (event.type === 'breadcrumb') {
+    if (event.type === 'breadcrumb' || event.type === 'performance') {
       return true;
     }
 
@@ -2848,349 +2848,6 @@ function initAndBind$1(clientClass, options) {
   var client = new clientClass(options);
   hub.bindClient(client);
 }
-
-var PromiseBuffer = PromiseBuffer$1,
-    BeidouError = BeidouError$1;
-var getCurrentHub$5 = getCurrentHub$6;
-/** Base Transport class implementation */
-
-var BaseTransport =
-/** @class */
-function () {
-  function BaseTransport() {
-    /**
-    * @deprecated
-    */
-    this.url = '';
-    /** A simple buffer holding all requests. */
-
-    this._buffer = new PromiseBuffer(30);
-  }
-  /**
-   * @description 返回上报接口链接
-   * @returns string
-   */
-
-
-  BaseTransport.prototype._getReportUrl = function () {
-    var client = getCurrentHub$5().getClient() || {
-      getOptions: function getOptions() {
-        return {
-          projectId: '',
-          url: ''
-        };
-      }
-    };
-    var url = client.getOptions().url;
-    return url;
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  BaseTransport.prototype.sendEvent = function (_) {
-    throw new BeidouError('Transport Class has to implement `sendEvent` method');
-  };
-  /**
-   * @inheritDoc
-   */
-
-
-  BaseTransport.prototype.close = function (timeout) {
-    return this._buffer.drain(timeout);
-  };
-
-  BaseTransport.prototype.finalFomartData = function (event) {
-    var projectId = event.projectId,
-        exceptions = event.exceptions,
-        apis = event.apis,
-        resources = event.resources,
-        performances = event.performances,
-        breadcrumbs = event.breadcrumbs,
-        type = event.type,
-        sdk = event.sdk,
-        request = event.request;
-
-    var content = __assign(__assign(__assign(__assign(__assign({
-      projectId: projectId,
-      type: type,
-      sdk: sdk,
-      request: request
-    }, performances && {
-      performances: performances
-    }), exceptions && {
-      exceptions: exceptions
-    }), apis && {
-      apis: apis
-    }), resources && {
-      resources: resources
-    }), breadcrumbs && {
-      breadcrumbs: breadcrumbs
-    });
-
-    if (content.type === 'exception' && content.exceptions && content.exceptions[0] && content.exceptions[0].stacktrace) {
-      try {
-        content.exceptions[0].stacktrace = JSON.stringify(content.exceptions[0].stacktrace);
-      } catch (e) {
-        content.exceptions[0].stacktrace = '[]';
-      }
-    }
-
-    try {
-      content = content;
-    } catch (e) {
-      content = {};
-    }
-
-    return content;
-  };
-
-  return BaseTransport;
-}();
-
-/**
- * 应用级事件 基础库>2.1.2
- * wx.onUnhandledRejection(function callback) -> App.onUnhandledRejection 监听未处理的 Promise 拒绝事件
- * wx.onAppShow -> App.onShow 监听小程序切前台事件
- * wx.onPageNotFound -> App.onPageNotFound 监听小程序要打开的页面不存在事件
- * wx.onError -> App.onError 监听小程序错误事件。如脚本错误或 API 调用报错等
- * wx.onAppHide -> App.onHide 监听小程序切后台事件
- * wx.getLaunchOptionsSync -> App.onLaunch 获取小程序启动时的参数
- */
-var APP_LIFE_CYCLE = ['onLaunch', 'onShow'];
-var PAGE_LIFE_CYCLE = ['onLoad', 'onShow', 'onReady', 'onHide'];
-var mp;
-
-var MP =
-/** @class */
-function () {
-  function MP() {}
-
-  Object.defineProperty(MP.prototype, "context", {
-    get: function get() {
-      if (this._context) return this._context;
-
-      if (typeof wx !== 'undefined') {
-        this._context = wx;
-      }
-
-      if (typeof swan !== 'undefined') {
-        this._context = swan;
-      }
-
-      if (typeof tt !== 'undefined') {
-        this._context = tt;
-      }
-
-      if (typeof my !== 'undefined') {
-        this._context = my;
-      }
-
-      if (typeof qq !== 'undefined') {
-        this._context = qq;
-      }
-
-      if (typeof qh !== 'undefined') {
-        this._context = qh;
-      }
-
-      return this._context;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "appName", {
-    get: function get() {
-      if (this._appName) return this._appName;
-
-      if (typeof wx !== 'undefined') {
-        this._appName = 'wx';
-      }
-
-      if (typeof swan !== 'undefined') {
-        this._appName = 'swan';
-      }
-
-      if (typeof tt !== 'undefined') {
-        this._appName = 'tt';
-      }
-
-      if (typeof my !== 'undefined') {
-        this._appName = 'my';
-      }
-
-      if (typeof qq !== 'undefined') {
-        this._appName = 'qq';
-      }
-
-      if (typeof qh !== 'undefined') {
-        this._appName = 'qh';
-      }
-
-      return this._appName;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "systemInfo", {
-    get: function get() {
-      if (this._systemInfo) return this._systemInfo;
-      this._systemInfo = this._context.getSystemInfoSync();
-      return this._systemInfo;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "userInfo", {
-    get: function get() {
-      var self = this;
-      if (this._userInfo) return this._userInfo;
-
-      this._context.getUserInfo({
-        success: function success(res) {
-          self._userInfo = res.userInfo || {};
-        }
-      });
-
-      return;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "networkInfo", {
-    get: function get() {
-      var self = this;
-      if (this._networkInfo) return this._networkInfo;
-
-      this._context.getNetworkType({
-        success: function success(res) {
-          self._networkInfo = {
-            signalStrength: res.signalStrength,
-            networkType: res.networkType
-          };
-        }
-      });
-
-      return;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "sceneInfo", {
-    get: function get() {
-      return this._sceneInfo;
-    },
-    set: function set(sceneInfo) {
-      this._sceneInfo = sceneInfo;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "indexPage", {
-    get: function get() {
-      return this._indexPage;
-    },
-    set: function set(indexPage) {
-      this._indexPage = indexPage;
-    },
-    enumerable: false,
-    configurable: true
-  });
-  Object.defineProperty(MP.prototype, "currentPage", {
-    get: function get() {
-      if (this.appName === 'qh') {
-        var path = $router.history.current.path;
-        return path;
-      }
-
-      var pages = getCurrentPages();
-
-      if (pages.length > 0) {
-        return pages[pages.length - 1].route;
-      } else {
-        return this._indexPage;
-      }
-    },
-    enumerable: false,
-    configurable: true
-  });
-
-  MP.instance = function () {
-    if (mp) return mp;
-    mp = new MP();
-    return mp;
-  };
-
-  return MP;
-}();
-
-var logger$3 = logger$4,
-    parseRetryAfterHeader = parseRetryAfterHeader$1;
-
-var RequestTransport =
-/** @class */
-function (_super) {
-  __extends(RequestTransport, _super);
-
-  function RequestTransport() {
-    var _this = _super !== null && _super.apply(this, arguments) || this;
-
-    _this._disabledUntil = new Date(Date.now());
-    return _this;
-  }
-
-  RequestTransport.prototype.sendEvent = function (event) {
-    var _this = this; // 429 Too Many Requests 表示在一定的时间内用户发送了太多的请求，即超出了“频次限制”。
-
-
-    if (new Date(Date.now()) < this._disabledUntil) {
-      return Promise.reject({
-        event: event,
-        reason: "Transport locked till " + this._disabledUntil + " due to too many requests.",
-        status: 429
-      });
-    }
-
-    var content = this.finalFomartData(event);
-    var ctx = MP.instance().context;
-    this.url = this._getReportUrl();
-    return this._buffer.add(new Promise(function (resolve, reject) {
-      ctx.request({
-        url: _this.url,
-        method: 'POST',
-        header: {
-          'content-type': 'multipart/form-data; boundary=XXX'
-        },
-        data: '\r\n--XXX' + '\r\nContent-Disposition: form-data; name="content"' + '\r\n' + '\r\n' + JSON.stringify(content) + '\r\n--XXX',
-        success: function success(response) {
-          var status = Status.fromHttpCode(response.status);
-
-          if (status === Status.Success) {
-            resolve({
-              status: status
-            });
-            return;
-          }
-
-          if (status === Status.RateLimit) {
-            var now = Date.now();
-            var retryAfterHeader = response.headers.get('Retry-After');
-            _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, retryAfterHeader));
-            logger$3.warn("Too many requests, backing off till: " + _this._disabledUntil);
-          }
-
-          reject(response);
-        },
-        fail: function fail(error) {
-          reject(error);
-        }
-      });
-    }));
-  };
-
-  return RequestTransport;
-}(BaseTransport);
 
 /**
  * This was originally forked from https://github.com/occ/TraceKit, but has since been
@@ -3651,6 +3308,359 @@ function eventFromString(input, syntheticException, options) {
   };
 }
 
+var PromiseBuffer = PromiseBuffer$1,
+    BeidouError = BeidouError$1;
+var getCurrentHub$5 = getCurrentHub$6;
+/** Base Transport class implementation */
+
+var BaseTransport =
+/** @class */
+function () {
+  function BaseTransport() {
+    /**
+    * @deprecated
+    */
+    this.url = '';
+    /** A simple buffer holding all requests. */
+
+    this._buffer = new PromiseBuffer(30);
+  }
+  /**
+   * @description 返回上报接口链接
+   * @returns string
+   */
+
+
+  BaseTransport.prototype._getReportUrl = function () {
+    var client = getCurrentHub$5().getClient() || {
+      getOptions: function getOptions() {
+        return {
+          projectId: '',
+          url: ''
+        };
+      }
+    };
+    var url = client.getOptions().url;
+    return url;
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  BaseTransport.prototype.sendEvent = function (_) {
+    throw new BeidouError('Transport Class has to implement `sendEvent` method');
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  BaseTransport.prototype.close = function (timeout) {
+    return this._buffer.drain(timeout);
+  };
+
+  BaseTransport.prototype.finalFomartData = function (event) {
+    var projectId = event.projectId,
+        exceptions = event.exceptions,
+        apis = event.apis,
+        resources = event.resources,
+        performances = event.performances,
+        breadcrumbs = event.breadcrumbs,
+        type = event.type,
+        sdk = event.sdk,
+        request = event.request;
+
+    var content = __assign(__assign(__assign(__assign(__assign({
+      projectId: projectId,
+      type: type,
+      sdk: sdk,
+      request: request
+    }, performances && {
+      performances: performances
+    }), exceptions && {
+      exceptions: exceptions
+    }), apis && {
+      apis: apis
+    }), resources && {
+      resources: resources
+    }), breadcrumbs && {
+      breadcrumbs: breadcrumbs
+    });
+
+    if (content.type === 'exception' && content.exceptions && content.exceptions[0] && content.exceptions[0].stacktrace) {
+      try {
+        content.exceptions[0].stacktrace = JSON.stringify(content.exceptions[0].stacktrace);
+      } catch (e) {
+        content.exceptions[0].stacktrace = '[]';
+      }
+    }
+
+    try {
+      content = content;
+    } catch (e) {
+      content = {};
+    }
+
+    return content;
+  };
+
+  return BaseTransport;
+}();
+
+/**
+ * 应用级事件 基础库>2.1.2
+ * wx.onUnhandledRejection(function callback) -> App.onUnhandledRejection 监听未处理的 Promise 拒绝事件
+ * wx.onAppShow -> App.onShow 监听小程序切前台事件
+ * wx.onPageNotFound -> App.onPageNotFound 监听小程序要打开的页面不存在事件
+ * wx.onError -> App.onError 监听小程序错误事件。如脚本错误或 API 调用报错等
+ * wx.onAppHide -> App.onHide 监听小程序切后台事件
+ * wx.getLaunchOptionsSync -> App.onLaunch 获取小程序启动时的参数
+ */
+var APP_LIFE_CYCLE = ['onLaunch', 'onShow'];
+var PAGE_LIFE_CYCLE = ['onLoad', 'onShow', 'onReady', 'onHide'];
+var mp;
+
+var MP =
+/** @class */
+function () {
+  function MP() {}
+
+  Object.defineProperty(MP.prototype, "context", {
+    get: function get() {
+      if (this._context) return this._context;
+
+      if (typeof wx !== 'undefined') {
+        this._context = wx;
+      }
+
+      if (typeof swan !== 'undefined') {
+        this._context = swan;
+      }
+
+      if (typeof tt !== 'undefined') {
+        this._context = tt;
+      }
+
+      if (typeof my !== 'undefined') {
+        this._context = my;
+      }
+
+      if (typeof qq !== 'undefined') {
+        this._context = qq;
+      }
+
+      if (typeof qh !== 'undefined') {
+        this._context = qh;
+      }
+
+      return this._context;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "appName", {
+    get: function get() {
+      if (this._appName) return this._appName;
+
+      if (typeof wx !== 'undefined') {
+        this._appName = 'wx';
+      }
+
+      if (typeof swan !== 'undefined') {
+        this._appName = 'swan';
+      }
+
+      if (typeof tt !== 'undefined') {
+        this._appName = 'tt';
+      }
+
+      if (typeof my !== 'undefined') {
+        this._appName = 'my';
+      }
+
+      if (typeof qq !== 'undefined') {
+        this._appName = 'qq';
+      }
+
+      if (typeof qh !== 'undefined') {
+        this._appName = 'qh';
+      }
+
+      return this._appName;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "systemInfo", {
+    get: function get() {
+      if (this._systemInfo) return this._systemInfo;
+      this._systemInfo = this._context.getSystemInfoSync();
+      return this._systemInfo;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "userInfo", {
+    get: function get() {
+      var self = this;
+      if (this._userInfo) return this._userInfo;
+
+      this._context.getUserInfo({
+        success: function success(res) {
+          self._userInfo = res.userInfo || {};
+        }
+      });
+
+      return;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "networkInfo", {
+    get: function get() {
+      var self = this;
+      if (this._networkInfo) return this._networkInfo;
+
+      this._context.getNetworkType({
+        success: function success(res) {
+          self._networkInfo = {
+            signalStrength: res.signalStrength,
+            networkType: res.networkType
+          };
+        }
+      });
+
+      return;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "sceneInfo", {
+    get: function get() {
+      return this._sceneInfo;
+    },
+    set: function set(sceneInfo) {
+      this._sceneInfo = sceneInfo;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "indexPage", {
+    get: function get() {
+      return this._indexPage;
+    },
+    set: function set(indexPage) {
+      this._indexPage = indexPage;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "currentPage", {
+    get: function get() {
+      if (this.appName === 'qh') {
+        var path = $router.history.current.path;
+        return path;
+      }
+
+      var pages = getCurrentPages();
+
+      if (pages.length > 0) {
+        return pages[pages.length - 1].route;
+      } else {
+        return this._indexPage;
+      }
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(MP.prototype, "pageParams", {
+    get: function get() {
+      return this._pageParams;
+    },
+    set: function set(data) {
+      this._pageParams = data;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  MP.instance = function () {
+    if (mp) return mp;
+    mp = new MP();
+    return mp;
+  };
+
+  return MP;
+}();
+
+var logger$3 = logger$4,
+    parseRetryAfterHeader = parseRetryAfterHeader$1;
+
+var RequestTransport =
+/** @class */
+function (_super) {
+  __extends(RequestTransport, _super);
+
+  function RequestTransport() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
+
+    _this._disabledUntil = new Date(Date.now());
+    return _this;
+  }
+
+  RequestTransport.prototype.sendEvent = function (event) {
+    var _this = this; // 429 Too Many Requests 表示在一定的时间内用户发送了太多的请求，即超出了“频次限制”。
+
+
+    if (new Date(Date.now()) < this._disabledUntil) {
+      return Promise.reject({
+        event: event,
+        reason: "Transport locked till " + this._disabledUntil + " due to too many requests.",
+        status: 429
+      });
+    }
+
+    var content = this.finalFomartData(event);
+    var ctx = MP.instance().context;
+    this.url = this._getReportUrl();
+    return this._buffer.add(new Promise(function (resolve, reject) {
+      ctx.request({
+        url: _this.url,
+        method: 'POST',
+        header: {
+          'content-type': 'multipart/form-data; boundary=XXX'
+        },
+        data: '\r\n--XXX' + '\r\nContent-Disposition: form-data; name="content"' + '\r\n' + '\r\n' + JSON.stringify(content) + '\r\n--XXX',
+        success: function success(response) {
+          var status = Status.fromHttpCode(response.status);
+
+          if (status === Status.Success) {
+            resolve({
+              status: status
+            });
+            return;
+          }
+
+          if (status === Status.RateLimit) {
+            var now = Date.now();
+            var retryAfterHeader = response.headers.get('Retry-After');
+            _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, retryAfterHeader));
+            logger$3.warn("Too many requests, backing off till: " + _this._disabledUntil);
+          }
+
+          reject(response);
+        },
+        fail: function fail(error) {
+          reject(error);
+        }
+      });
+    }));
+  };
+
+  return RequestTransport;
+}(BaseTransport);
+
 var MiniProgramBackend =
 /** @class */
 function (_super) {
@@ -3719,8 +3729,8 @@ function (_super) {
   return MiniProgramClient;
 }(BaseClient);
 
-var SDK_NAME = 'mp_monitor';
-var SDK_VERSION = '0.0.1';
+var SDK_NAME = 'mp-monitor';
+var SDK_VERSION = '1.0.0';
 
 var uuid4$2 = uuid4$3,
     logger$2 = logger$4;
@@ -3778,8 +3788,16 @@ function () {
           var mpInstance = MP.instance();
           var systemInfo = mpInstance.systemInfo || '';
           var networkInfo = mpInstance.networkInfo || '';
-          var sceneInfo = mpInstance.sceneInfo || '';
+          var sceneInfo = mpInstance.sceneInfo || {};
           var userInfo = mpInstance.userInfo || '';
+          var pageParams = mpInstance.pageParams || {};
+
+          if (mpInstance.currentPage === pageParams.url) {
+            sceneInfo = Object.assign(sceneInfo, {
+              pageParams: pageParams
+            });
+          }
+
           event.request = {
             url: mpInstance.currentPage,
             headers: {
@@ -4469,6 +4487,14 @@ function (_super) {
   return Transaction;
 }(Span);
 
+function addAppContexts(transaction, beidouTimeLine) {
+  transaction.addPageContext({
+    description: 'READY0',
+    time: beidouTimeLine.ready - beidouTimeLine["in"],
+    extra: encodeURIComponent(JSON.stringify(beidouTimeLine.AppLaunch.extra))
+  });
+}
+
 /**
  * @file 性能明细
  **/
@@ -4491,14 +4517,6 @@ function addNavigationSpans(transaction, beidouTimeLine) {
       startTimestamp: beidouTimeLine[structure.startTimestamp],
       endTimestamp: beidouTimeLine[structure.endTimestamp]
     });
-  });
-}
-
-function addAppContexts(transaction, beidouTimeLine) {
-  transaction.addPageContext({
-    description: 'READY0',
-    time: beidouTimeLine.ready - beidouTimeLine["in"],
-    extra: encodeURIComponent(JSON.stringify(beidouTimeLine.AppLaunch.extra))
   });
 }
 
@@ -4555,9 +4573,11 @@ function () {
     this.interceptPage = function () {
       var self = _this;
       var isTaro = typeof process !== 'undefined' && typeof process.env !== 'undefined' && typeof process.env.TARO_ENV !== 'undefined' ? true : false;
-      var primaryPage = isTaro ? Component : Page;
+      var primaryPage = Page;
 
       if (isTaro) {
+        var primaryComponent_1 = Component;
+
         Component = function Component(obj) {
           PAGE_LIFE_CYCLE.forEach(function (name) {
             if (typeof obj.methods[name] === 'function') {
@@ -4568,20 +4588,20 @@ function () {
               };
             }
           });
-          primaryPage && primaryPage.call(_this, obj);
-        };
-      } else {
-        Page = function Page(obj) {
-          PAGE_LIFE_CYCLE.forEach(function (name) {
-            var primaryHookFn = obj[name];
-
-            obj[name] = function (info) {
-              return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
-            };
-          });
-          primaryPage && primaryPage.call(_this, obj);
+          primaryComponent_1 && primaryComponent_1.call(_this, obj);
         };
       }
+
+      Page = function Page(obj) {
+        PAGE_LIFE_CYCLE.forEach(function (name) {
+          var primaryHookFn = obj[name];
+
+          obj[name] = function (info) {
+            return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
+          };
+        });
+        primaryPage && primaryPage.call(_this, obj);
+      };
     }; //@ts-ignore
 
 
@@ -4589,7 +4609,7 @@ function () {
       "in": Date.now() || new Date().getTime()
     }; // @ts-ignore
 
-    this._appLanch = null;
+    this._appLanch = {};
     this._fpDown = false;
     this.interceptApp();
     this.interceptPage();
@@ -4597,11 +4617,19 @@ function () {
 
   MPVitals.prototype.rewritePageLifeCycle = function (name, self, primaryHookFn, info) {
     var date = Date.now() || new Date().getTime();
+    var mpInstance = MP.instance();
     console.log("Page\uFF1A" + name + "_" + date);
     this.__TIMELINE__["Page_" + name] = date;
 
     if (name === 'onHide') {
       this.__TIMELINE__['Page_init'] = date;
+    }
+
+    if (name === 'onLoad') {
+      mpInstance.pageParams = {
+        url: mpInstance.currentPage,
+        query: info
+      };
     } //页面渲染完成上报性能数据
 
 
@@ -4694,7 +4722,7 @@ var initAndBind = initAndBind$1;
 var defaultIntegrations = [new Common(), new GlobalHandlers(), new ApiError(), new ResourceErrorIntegration(), new MPTracing() // 性能
 ];
 /**
- * Beidou初始化调用处理
+ * 初始化调用处理
  */
 
 function init(options) {

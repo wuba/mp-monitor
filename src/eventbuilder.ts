@@ -1,5 +1,5 @@
-import { Event, EventHint, Options, Exception, utils } from './shared'
 import { eventFromPlainObject, eventFromStacktrace, prepareFramesForEvent } from './parsers';
+import { Event, EventHint, Exception, Options, utils } from './shared';
 import { computeStackTrace } from './tracekit';
 
 const {

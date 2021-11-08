@@ -1,5 +1,5 @@
-import { Event, Response, Status, utils } from '../shared';
 import MP from '../mp';
+import { Event, Response, Status, utils } from '../shared';
 import { BaseTransport } from './base';
 
 const { logger, parseRetryAfterHeader } = utils;

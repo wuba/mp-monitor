@@ -1,7 +1,5 @@
 import { Event, WrappedFunction } from '../types';
-
 import { isString } from './is';
-
 
 // 尽量挂载在__BEIDOU__下面,不影响全局空间
 interface BeidouGlobal {

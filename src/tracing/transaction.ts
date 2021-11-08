@@ -1,5 +1,6 @@
-import { TransactionContext, utils, reducer } from '../shared';
+import { reducer, TransactionContext, utils } from '../shared';
 import { Span as SpanClass, SpanRecorder } from './span';
+
 const { isInstanceOf, logger } = utils
 const { getCurrentHub } = reducer;
 

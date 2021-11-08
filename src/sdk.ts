@@ -1,10 +1,11 @@
 import './globalfix';
 
-import { core } from './shared';
-
 import { MiniProgramOptions } from './backend';
 import { MiniProgramClient } from './client';
-import { Common, ApiError, GlobalHandlers, ResourceErrorIntegration, MPTracing } from './integrations';
+import {
+    ApiError, Common, GlobalHandlers, MPTracing, ResourceErrorIntegration
+} from './integrations';
+import { core } from './shared';
 
 const { initAndBind } = core;
 

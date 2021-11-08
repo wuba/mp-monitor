@@ -1,6 +1,5 @@
-import { core } from './shared';
-
 import { MiniProgramBackend, MiniProgramOptions } from './backend';
+import { core } from './shared';
 
 export class MiniProgramClient extends core.BaseClient<MiniProgramBackend, MiniProgramOptions> {
   /**

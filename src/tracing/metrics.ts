@@ -2,11 +2,12 @@
  * @file 性能明细
  **/
 
+import { timelineStructure } from '../constant';
 import { SpanContext } from '../shared';
+import { BeiDouTimeLine } from '../types/tracing';
 import { Span } from './span';
 import { Transaction } from './transaction';
-import { BeiDouTimeLine } from '../types/tracing'
-import { timelineStructure } from '../constant'
+
 export function _startChild(transaction: Transaction, { startTimestamp, ...ctx }: SpanContext): Span {
   if (startTimestamp && transaction.startTimestamp > startTimestamp) {
     transaction.startTimestamp = startTimestamp;

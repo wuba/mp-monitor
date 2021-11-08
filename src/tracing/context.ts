@@ -1,11 +1,11 @@
 /***
  * 性能附件数据
  */
+import { BeiDouTimeLine } from '../types/tracing';
 /**
  * @file 获取navigation
  **/
 import { Transaction } from './transaction';
-import { BeiDouTimeLine } from '../types/tracing'
 
 export function addAppContexts(transaction: Transaction, beidouTimeLine: BeiDouTimeLine) {
   transaction.addPageContext({

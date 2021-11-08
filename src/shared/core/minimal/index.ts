@@ -1,6 +1,6 @@
 import { getCurrentHub, Hub, Scope } from '../../hub';
 import { Breadcrumb, CaptureContext, Event, Transaction, TransactionContext } from '../../types';
-import { logger, isString, truncate,getGlobalObject } from '../../utils';
+import { getGlobalObject, isString, logger, truncate } from '../../utils';
 
 /**
  * This calls a function on the current hub.

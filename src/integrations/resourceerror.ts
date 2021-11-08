@@ -1,6 +1,6 @@
-import { core, Integration, Event, utils } from '../shared';
-import { MPResource } from '../types//resource';
 import { addInstrumentationHandler } from '../instrument';
+import { core, Event, Integration, utils } from '../shared';
+import { MPResource } from '../types/resource';
 
 const { getCurrentHub } = core;
 const { uuid4 } = utils;

@@ -1,14 +1,7 @@
 /* eslint-disable max-lines */
 import {
-  Breadcrumb,
-  CaptureContext,
-  Event,
-  EventHint,
-  EventProcessor,
-  Scope as ScopeInterface,
-  ScopeContext,
-  Span,
-  Transaction,
+    Breadcrumb, CaptureContext, Event, EventHint, EventProcessor, Scope as ScopeInterface,
+    ScopeContext, Span, Transaction
 } from '../types';
 import { getGlobalObject, isPlainObject, isThenable, SyncPromise, timestampWithMs } from '../utils';
 

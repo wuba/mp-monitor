@@ -1,19 +1,9 @@
 /* eslint-disable max-lines */
 import {
-  Breadcrumb,
-  BreadcrumbHint,
-  Client,
-  Event,
-  EventHint,
-  Hub as HubInterface,
-  Integration,
-  IntegrationClass,
-  Span,
-  SpanContext,
-  Transaction,
-  TransactionContext,
+    Breadcrumb, BreadcrumbHint, Client, Event, EventHint, Hub as HubInterface, Integration,
+    IntegrationClass, Span, SpanContext, Transaction, TransactionContext
 } from '../types';
-import { getGlobalObject, logger, timestampWithMs, consoleSandbox, uuid4 } from '../utils';
+import { consoleSandbox, getGlobalObject, logger, timestampWithMs, uuid4 } from '../utils';
 import { Carrier, Layer } from './interfaces';
 import { Scope } from './scope';
 

@@ -1,4 +1,4 @@
-import { Event, Response, Transport, utils, core } from '../shared';
+import { core, Event, Response, Transport, utils } from '../shared';
 
 const {
   PromiseBuffer, BeidouError,

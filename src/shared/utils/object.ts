@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExtendedError, WrappedFunction } from '../types';
-
-import { isElement, isError, isEvent, isInstanceOf, isPlainObject, isPrimitive, isSyntheticEvent } from './is';
+import {
+    isElement, isError, isEvent, isInstanceOf, isPlainObject, isPrimitive, isSyntheticEvent
+} from './is';
 import { Memo } from './memo';
 import { getFunctionName, htmlTreeAsString } from './misc';
 import { truncate } from './string';

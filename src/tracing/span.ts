@@ -1,7 +1,6 @@
+import { DEFAULT_MAX_SPAN } from '../constant';
 /* eslint-disable max-lines */
-import { Span as SpanInterface, SpanContext, PageContext, utils } from '../shared'
-
-import { DEFAULT_MAX_SPAN } from '../constant'
+import { PageContext, Span as SpanInterface, SpanContext, utils } from '../shared';
 
 const { timestampWithMs, isPlainObject } = utils
 

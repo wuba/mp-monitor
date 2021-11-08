@@ -1,8 +1,8 @@
 import MP, { APP_LIFE_CYCLE, PAGE_LIFE_CYCLE } from '../mp';
-import { Transaction } from './transaction';
-import { addNavigationSpans } from './metrics'
-import { addAppContexts } from './context'
 import { BeiDouTimeLine } from '../types/tracing';
+import { addAppContexts } from './context';
+import { addNavigationSpans } from './metrics';
+import { Transaction } from './transaction';
 
 // @ts-ignore
 let vitals: MPVitals = null;
@@ -32,7 +32,7 @@ export class MPVitals {
       in: Date.now() || new Date().getTime()
     };
     // @ts-ignore
-    this._appLanch = null;
+    this._appLanch = {};
 
     this._fpDown = false;
 
@@ -76,8 +76,9 @@ export class MPVitals {
   private interceptPage = (): void => {
     let self = this;
     let isTaro = (typeof (process) !== 'undefined' && typeof (process.env) !== 'undefined' && typeof (process.env.TARO_ENV) !== 'undefined') ? true : false;
-    const primaryPage = isTaro ? Component : Page;
+    const primaryPage = Page;
     if (isTaro) {
+      let primaryComponent = Component;
       Component = (obj: any) => {
         PAGE_LIFE_CYCLE.forEach(name => {
           if (typeof obj.methods[name] === 'function') {
@@ -87,28 +88,35 @@ export class MPVitals {
             }
           }
         });
-        primaryPage && primaryPage.call(this, obj);
+        primaryComponent && primaryComponent.call(this, obj);
       }
-    } else {
-      Page = (obj: any) => {
-        PAGE_LIFE_CYCLE.forEach(name => {
-          const primaryHookFn = obj[name];
-          obj[name] = function (info: any) {
-            return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
-          }
-        });
-        primaryPage && primaryPage.call(this, obj);
-      }
+    }
+    Page = (obj: any) => {
+      PAGE_LIFE_CYCLE.forEach(name => {
+        const primaryHookFn = obj[name];
+        obj[name] = function (info: any) {
+          return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
+        }
+      });
+      primaryPage && primaryPage.call(this, obj);
     }
   }
 
   private rewritePageLifeCycle(name: string, self: this, primaryHookFn: any, info: any) {
     let date = Date.now() || new Date().getTime();
+    const mpInstance = MP.instance();
     console.log(`Page：${name}_${date}`);
     this.__TIMELINE__[`Page_${name}`] = date;
 
     if (name === 'onHide') {
       this.__TIMELINE__['Page_init'] = date;
+    }
+
+    if (name === 'onLoad') {
+      mpInstance.pageParams = {
+        url: mpInstance.currentPage,
+        query: info
+      };
     }
 
     //页面渲染完成上报性能数据

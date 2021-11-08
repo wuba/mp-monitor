@@ -1,6 +1,6 @@
-import { core, Options, Transport, EventHint, Event } from './shared';
-import { RequestTransport } from './transports';
 import { eventFromException } from './eventbuilder';
+import { core, Event, EventHint, Options, Transport } from './shared';
+import { RequestTransport } from './transports';
 
 /**
  * Configuration options for the MiniProgram SDK.

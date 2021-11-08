@@ -1,9 +1,8 @@
+import MP from '../mp';
 /*
  * @file 处理event公共信息
  * */
 import { API, core, Event, Integration, IPerformance, Resource, utils } from '../shared';
-
-import MP from '../mp';
 import { SDK_NAME, SDK_VERSION } from '../version';
 
 const { uuid4, logger } = utils;
@@ -59,8 +58,14 @@ export class Common implements Integration {
         let mpInstance = MP.instance();
         const systemInfo: any = mpInstance.systemInfo || '';
         const networkInfo: any = mpInstance.networkInfo || '';
-        const sceneInfo: any = mpInstance.sceneInfo || '';
+        let sceneInfo: any = mpInstance.sceneInfo || {};
         const userInfo: any = mpInstance.userInfo || '';
+        var pageParams = mpInstance.pageParams || {};
+        if (mpInstance.currentPage === pageParams.url) {
+          sceneInfo = Object.assign(sceneInfo, {
+            pageParams: pageParams
+          });
+        }
         event.request = {
           url: mpInstance.currentPage,
           headers: {
