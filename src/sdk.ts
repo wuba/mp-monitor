@@ -3,7 +3,7 @@ import './globalfix';
 import { MiniProgramOptions } from './backend';
 import { MiniProgramClient } from './client';
 import {
-    ApiError, Common, GlobalHandlers, MPTracing, ResourceErrorIntegration
+  ApiError, Common, GlobalHandlers, MPTracing, ResourceErrorIntegration
 } from './integrations';
 import { core } from './shared';
 
@@ -24,7 +24,7 @@ const defaultIntegrations = [
  * 初始化调用处理
  */
 export function init(options: MiniProgramOptions = { url: '' }): void {
-  options.isDebug = true;
+  options.isDebug = options.isDebug || false;
   options.isProd = true;
 
   options.defaultIntegrations = defaultIntegrations;

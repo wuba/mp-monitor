@@ -149,6 +149,7 @@ function instrumentResource(ctx: object): void {
         originFail(error);
       }
       triggerHandlers('resource', {
+        statusCode: -1,
         errMsg: error.errMsg,
         url: downloadOptions.url || ''
       });
