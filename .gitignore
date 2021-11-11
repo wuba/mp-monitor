@@ -34,6 +34,5 @@ eslintcache/*
 # node version
 .node-version
 
-package-lock.json
 yarn.lock
 
