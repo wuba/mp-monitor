@@ -1,2 +1,2 @@
 export { BaseTransport } from './base';
-export { RequestTransport } from './request';
+export { MiddlewareTransport } from './middleware';

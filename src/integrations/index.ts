@@ -3,3 +3,4 @@ export { ApiError } from './apierror';
 export { ResourceErrorIntegration } from './resourceerror';
 export { GlobalHandlers } from './globalhandlers';
 export { MPTracing } from '../tracing';
+export { Breadcrumbs } from './breadcrumbs';

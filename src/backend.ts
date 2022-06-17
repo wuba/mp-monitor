@@ -1,5 +1,5 @@
 import { core, Options, Transport, EventHint, Event } from './shared';
-import { RequestTransport } from './transports';
+import { MiddlewareTransport } from './transports';
 import { eventFromException } from './eventbuilder';
 
 /**
@@ -7,6 +7,10 @@ import { eventFromException } from './eventbuilder';
  * @see MiniProgramFrontend for more information.
  */
 export interface MiniProgramOptions extends Options {
+  // 异常上报接口
+  url?: string;
+
+  maxSendEvent?: number;
   /**
    * Enables native crashHandling. This only works if `enableNative` is `true`.
    * Defaults to `true`.
@@ -19,6 +23,8 @@ export interface MiniProgramOptions extends Options {
   /** Should the native nagger alert be shown or not. */
   enableNativeNagger?: boolean;
 
+  // 是否上报行为轨迹
+  reportBreadcrumb?: boolean;
 
   /** The interval to end a session if the App goes to the background. */
   sessionTrackingIntervalMillis?: number;
@@ -47,7 +53,7 @@ export class MiniProgramBackend extends core.BaseBackend<Options> {
    * 上报异常不通过 logger.error 输出
    * 小程序拦截了 console.error
    * 避免上报死循环
-   * @param event 
+   * @param event
    */
   public sendEvent(event: Event): void {
     this._transport.sendEvent(event).then(null, reason => {
@@ -59,6 +65,6 @@ export class MiniProgramBackend extends core.BaseBackend<Options> {
    * @inheritDoc
    */
   protected _setupTransport(): Transport {
-    return new RequestTransport();
+    return new MiddlewareTransport();
   }
 }

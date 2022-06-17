@@ -12,6 +12,6 @@ if (typeof navigator === 'undefined') {
         userAgent: ''
     }
 }
-if (!global.console) {
+if (global && !global.console) {
     global.console = console;
 }

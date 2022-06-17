@@ -1,6 +1,6 @@
 {
   "name": "mp_monitor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "小程序监控sdk",
   "main": "dist/mp_monitor.min.js",
   "module": "dist/mp_monitor.es.js",

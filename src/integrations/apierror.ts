@@ -1,7 +1,7 @@
 import { core, Event, Integration, utils } from '../shared';
 
 import { addInstrumentationHandler } from '../instrument';
-import { MPAPI } from 'src/types/api';
+import { MPAPI } from '../types/api';
 const { uuid4, getGlobalObject, repeatCheck, isString } = utils;
 const { getCurrentHub } = core;
 const hub = getCurrentHub();
@@ -45,8 +45,6 @@ export class ApiError implements Integration {
     if (!handlerData.endTimestamp) return;
     if (!handlerData.response) handlerData.response = { statusCode: -1 };
 
-    // 过滤北斗域名和图片路径
-    if (this._filterUrl(handlerData.url, handlerData.method)) return;
     // 处理重复请求
     if (repeatCheck(handlerData.method, handlerData.url)) return;
 
@@ -55,7 +53,7 @@ export class ApiError implements Integration {
       method: isString(handlerData.method) ? handlerData.method.toUpperCase() : 'GET',
       url: this._formatUrl(handlerData.url),
       statusCode: handlerData?.response?.statusCode,
-      errMsg: handlerData?.error?.errMsg,
+      errMsg: encodeURIComponent(JSON.stringify(handlerData?.error?.errMsg)),
       eventId: uuid4(),
       timestamp: Date.now(),
     };
@@ -63,6 +61,26 @@ export class ApiError implements Integration {
       apis: [apiVal],
       type: 'api',
     };
+
+    /**
+    * 根因分析：如果开启行为轨迹采集 & 高频异常主动上报行为轨迹日志
+    */
+    // const client: any = getCurrentHub().getClient()
+    // const options = client?.getOptions();
+    // if (options && options.reportBreadcrumb) {
+    //   let status = Status.fromHttpCode(handlerData.response.statusCode);
+    //   if (status === Status.Success && handlerData.url.includes('/common')) {
+    //     let { result = '' } = handlerData.response.data;
+    //     if (result) {
+    //       const ctx = MP.instance().context;
+    //       ctx.reportBreadcrumb();
+    //     }
+    //   }
+    // }
+    // if (handlerData.url.match(/newBehavior/)) {
+    //   // @ts-ignore 上报成功清空面包屑 
+    //   hub.clearBreadcrumbs();
+    // }
 
     if (handlerData.response.statusCode >= 400) {
       hub.captureEvent({ ...payload });
@@ -79,34 +97,6 @@ export class ApiError implements Integration {
       payload!.apis![0].statusCode = 408;
       hub.captureEvent({ ...payload });
     }
-  }
-
-  // 过滤url
-  private _filterUrl = (url: string, method: string): boolean => {
-    if (url.match(/tzjybeidou\.58\.com/) && method === 'POST') {
-      // We will not create breadcrumbs for fetch requests that contain `beidou_key` (internal beidou requests)
-      return true;
-    }
-
-    if (url.match(/\.(png|jpe?g|gif)$/)) {
-      return true;
-    }
-
-    // todo 本地请求不监听。
-
-    const client = hub.getClient();
-    const clientOptions: { [key: string]: any } = client ? client.getOptions() : {};
-    let temp = false;
-
-    if (clientOptions.denyUrls) {
-      clientOptions.denyUrls.forEach((item: any) => {
-        if (url.match(item)) {
-          temp = true;
-        }
-      });
-    }
-
-    return temp;
   }
 
   // 补全url

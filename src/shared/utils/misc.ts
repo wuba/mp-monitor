@@ -5,12 +5,17 @@ import { isString } from './is';
 
 // 尽量挂载在__BEIDOU__下面,不影响全局空间
 interface BeidouGlobal {
-  __BEIDOU__: {
-    globalEventProcessors: any;
-    hub: any;
-    logger: any;
-    isInit: boolean;
+  __BEIDOU__?: {
+    globalEventProcessors?: any;
+    hub?: any;
+    logger?: any;
+    isInit?: boolean;
+    extensions?: any;
   };
+
+  __PERFORMANCE__?: any
+
+  __WBAPP__?: any
 }
 
 /**
@@ -44,10 +49,10 @@ export function getGlobalObject<T>(): T & typeof globalThis & BeidouGlobal {
   return (isNodeEnv()
     ? global
     : typeof window !== 'undefined'
-    ? window
-    : typeof self !== 'undefined'
-    ? self
-    : fallbackGlobalObject) as T & typeof globalThis & BeidouGlobal;
+      ? window
+      : typeof self !== 'undefined'
+        ? self
+        : fallbackGlobalObject) as T & typeof globalThis & BeidouGlobal;
 }
 
 /**

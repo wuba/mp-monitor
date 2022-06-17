@@ -6,7 +6,7 @@ export {
   captureEvent,
   startTransaction,
   withScope,
-  pageLoadTrace
+  pageLoadTrace,
 } from './minimal';
 export { BaseClient } from './baseclient';
 export { BackendClass, BaseBackend } from './basebackend';

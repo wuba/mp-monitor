@@ -50,6 +50,8 @@ export class GlobalHandlers implements Integration {
                 content = args[i].message.replace(/\n/g, " ");
                 stack = args[i].stack;
                 break;
+              } else if (typeof (args[i]) === 'object') {
+                content += JSON.stringify(args[i]);
               } else {
                 content += args[i].toString();
               }
@@ -75,8 +77,21 @@ export class GlobalHandlers implements Integration {
           exceptions: [exceptionVal],
           type: 'exception'
         }
-
         hub.captureEvent({ ...payload });
+
+        // 同时上报行为轨迹
+        const event: any = {
+          exceptions: [{
+            content: errType,
+            contents: `${errType}: ${content}`,
+            stacktrace: stack || args[0],
+            endTimestamp: Date.now(),
+            startTimestamp: Date.now()
+          }],
+          type: 'exception',
+          logType: 'breadcrumb',
+        }
+        hub.captureEvent(event);
       },
       type: 'error'
     });

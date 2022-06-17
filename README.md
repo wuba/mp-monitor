@@ -12,7 +12,9 @@ npm i mp_monitor --save
 const mpMonitor = require('mp_monitor');
 mpMonitor.init({
   projectId: '',
-  url: ''
+  url: '', // 异常上报接口
+  isDebug: true, // 默认关闭 开启后控制台打印日志；不触发上报接口
+  reportBreadcrumb: true, // 是否开启行为轨迹日志采集(默认false)
 });
 ```
 
@@ -35,6 +37,8 @@ mpMonitor.init({
 
 - projectId: 项目标识
 - url: 异常日志上报接口地址
+- isDebug: 默认关闭 开启后控制台打印日志；不触发上报接口
+- reportBreadcrumb: 是否开启行为轨迹日志采集 默认false
 
 ### 特性
 
@@ -44,4 +48,5 @@ mpMonitor.init({
 - 采集小程序页面维度性能数据
 - 记录客户端基本信息（系统信息、用户信息、网络信息、场景信息）
 - 支持微信、百度、头条、支付宝、QQ、360等多端异常采集
-- 采集用户行为轨迹【进行中】
+- 采集用户行为轨迹
+  支持用户自定义上报行为轨迹 wx.reportBreadcrumb()

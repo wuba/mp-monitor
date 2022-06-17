@@ -18,7 +18,7 @@ if (typeof navigator === 'undefined') {
   };
 }
 
-if (!global.console) {
+if (global && !global.console) {
   global.console = console;
 }
 
@@ -74,6 +74,44 @@ function __rest(s, e) {
                 t[p[i]] = s[p[i]];
         }
     return t;
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
 }
 
 function __values(o) {
@@ -680,7 +718,7 @@ function isInstanceOf$1(wat, base) {
 var global$2 = getGlobalObject$1();
 /** Prefix for logging strings */
 
-var PREFIX = 'Beidou Logger ';
+var PREFIX = 'MpMonitor Logger ';
 /** JSDoc */
 
 var Logger = function () {
@@ -759,7 +797,7 @@ var Logger = function () {
 }();
 
 global$2.__BEIDOU__ = global$2.__BEIDOU__ || {};
-var logger$4 = global$2.__BEIDOU__.logger || (global$2.__BEIDOU__.logger = new Logger());
+var logger$5 = global$2.__BEIDOU__.logger || (global$2.__BEIDOU__.logger = new Logger());
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
@@ -1127,7 +1165,9 @@ function intercept$1(source, name, replacement) {
   if (typeof wrapped === 'function') {
     try {
       Object.defineProperties(source, (_a = {}, _a[name] = {
-        enumerable: false,
+        configurable: true,
+        enumerable: true,
+        writable: true,
         value: wrapped
       }, _a));
     } catch (_Oo) {// This can throw if multiple fill happens on a global object like XMLHttpRequest
@@ -1136,7 +1176,7 @@ function intercept$1(source, name, replacement) {
   } else {
     source[name] = wrapped;
   }
-}
+} // 按照指定规则，过滤 object 中的相关值。类似 Array.filter
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /** SyncPromise internal states */
@@ -1159,7 +1199,7 @@ var States;
  */
 
 
-var SyncPromise$1 = function () {
+var SyncPromise$2 = function () {
   function SyncPromise(executor) {
     var _this = this;
 
@@ -1407,7 +1447,7 @@ var PromiseBuffer$1 = function () {
     var _this = this;
 
     if (!this.isReady()) {
-      return SyncPromise$1.reject(new BeidouError$1('Not adding Promise due to buffer limit reached.'));
+      return SyncPromise$2.reject(new BeidouError$1('Not adding Promise due to buffer limit reached.'));
     }
 
     if (this._buffer.indexOf(task) === -1) {
@@ -1448,13 +1488,13 @@ var PromiseBuffer$1 = function () {
   PromiseBuffer.prototype.drain = function (timeout) {
     var _this = this;
 
-    return new SyncPromise$1(function (resolve) {
+    return new SyncPromise$2(function (resolve) {
       var capturedSetTimeout = setTimeout(function () {
         if (timeout && timeout > 0) {
           resolve(false);
         }
       }, timeout);
-      SyncPromise$1.all(_this._buffer).then(function () {
+      SyncPromise$2.all(_this._buffer).then(function () {
         clearTimeout(capturedSetTimeout);
         resolve(true);
       }).then(null, function () {
@@ -1750,7 +1790,7 @@ var Scope = function () {
       index = 0;
     }
 
-    return new SyncPromise$1(function (resolve, reject) {
+    return new SyncPromise$2(function (resolve, reject) {
       var processor = processors[index];
 
       if (event === null || typeof processor !== 'function') {
@@ -2016,6 +2056,36 @@ var Hub = function () {
     }
 
     top.scope.addBreadcrumb(finalBreadcrumb, Math.min(maxBreadcrumbs, MAX_BREADCRUMBS));
+  };
+  /**
+   * @inheritDoc
+   * 获取面包屑
+   */
+
+
+  Hub.prototype.getBreadcrumb = function () {
+    var top = this.getStackTop();
+
+    if (!top.scope || !top.client) {
+      return [];
+    }
+
+    return top.scope.getBreadcrumb();
+  };
+  /**
+   * @inheritDoc
+   * 清空面包屑
+   */
+
+
+  Hub.prototype.clearBreadcrumbs = function () {
+    var top = this.getStackTop();
+
+    if (!top.scope || !top.client) {
+      return;
+    }
+
+    top.scope.clearBreadcrumbs();
   }; // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
@@ -2055,7 +2125,7 @@ var Hub = function () {
     try {
       return client.getIntegration(integration);
     } catch (_oO) {
-      logger$4.warn("Cannot retrieve integration " + integration.id + " from the current Hub");
+      logger$5.warn("Cannot retrieve integration " + integration.id + " from the current Hub");
       return null;
     }
   };
@@ -2121,7 +2191,7 @@ var Hub = function () {
       return beidou.extensions[method].apply(this, args);
     }
 
-    logger$4.warn("Extension method " + method + " couldn't be found, doing nothing.");
+    logger$5.warn("Extension method " + method + " couldn't be found, doing nothing.");
   };
 
   return Hub;
@@ -2140,7 +2210,7 @@ function getMainCarrier() {
  * 返回挂载的hub实例
  */
 
-function getCurrentHub$6() {
+function getCurrentHub$a() {
   var registry = getMainCarrier();
 
   if (!hasHubOnCarrier(registry)) {
@@ -2198,12 +2268,26 @@ var EventTypeEnum;
 
 (function (EventTypeEnum) {
   EventTypeEnum["resource"] = "resource";
+  EventTypeEnum["resource_success"] = "resource_success";
   EventTypeEnum["api"] = "api";
   EventTypeEnum["api_rate"] = "api_rate";
+  EventTypeEnum["api_dyeing"] = "api_dyeing";
+  EventTypeEnum["api_success"] = "api_success";
   EventTypeEnum["exception"] = "exception";
   EventTypeEnum["performance"] = "performance";
+  EventTypeEnum["hybrid"] = "hybrid";
+  EventTypeEnum["dom"] = "dom";
+  EventTypeEnum["custom"] = "custom";
   EventTypeEnum["breadcrumb"] = "breadcrumb";
 })(EventTypeEnum || (EventTypeEnum = {}));
+/** 日志上报类型(普通日志|行为轨迹) */
+
+
+var LogTypeEnum;
+
+(function (LogTypeEnum) {
+  LogTypeEnum["breadcrumb"] = "breadcrumb";
+})(LogTypeEnum || (LogTypeEnum = {}));
 
 /** Console logging verbosity for the SDK. */
 var LogLevel;
@@ -2350,9 +2434,9 @@ function setupIntegration(integration) {
     return;
   }
 
-  integration.setupOnce(addGlobalEventProcessor$1, getCurrentHub$6);
+  integration.setupOnce(addGlobalEventProcessor$1, getCurrentHub$a);
   installedIntegrations.push(integration.name);
-  logger$4.log("Integration installed: " + integration.name);
+  logger$5.log("Integration installed: " + integration.name);
 }
 function setupIntegrations(options) {
   var integrations = {};
@@ -2367,7 +2451,9 @@ function setupIntegrations(options) {
   return integrations;
 }
 
-var DEFAULT_MAX_COUNT = 25; // 限制当前页面最大上报量
+var DEFAULT_SEND_EVENT = 30; // 默认上报次数
+
+var MAX_ALLOW_SEND_EVENT = 500; // 允许上报的最大次数
 
 var BaseClient = function () {
   /**
@@ -2382,8 +2468,10 @@ var BaseClient = function () {
     /** Is the client still processing a call? */
 
     this._processing = false;
-    this._count = DEFAULT_MAX_COUNT;
     this._backend = new backendClass(options);
+    var _a = options.maxSendEvent,
+        maxSendEvent = _a === void 0 ? DEFAULT_SEND_EVENT : _a;
+    this._max = Math.min(maxSendEvent, MAX_ALLOW_SEND_EVENT);
     this._options = options;
   }
   /**
@@ -2408,7 +2496,7 @@ var BaseClient = function () {
 
   BaseClient.prototype._devEnvHandle = function () {
     if (isDevHref()) {
-      logger$4.warn("\u76D1\u63A7\u4F60\u5728\u672C\u5730\u670D\u52A1\u8FDB\u884C\u5F00\u53D1\uFF0C\u4E0D\u4F1A\u8FDB\u884C\u5317\u6597\u4E0A\u62A5");
+      logger$5.warn("\u76D1\u63A7\u4F60\u5728\u672C\u5730\u670D\u52A1\u8FDB\u884C\u5F00\u53D1\uFF0C\u4E0D\u4F1A\u8FDB\u884C\u5317\u6597\u4E0A\u62A5");
       return true; // return false
     }
 
@@ -2416,19 +2504,19 @@ var BaseClient = function () {
   }; // 上报前策略处理
 
 
-  BaseClient.prototype._limitCount = function (event) {
+  BaseClient.prototype._allowSent = function (event) {
     // 面包屑没有参与统计
-    if (event.type === 'breadcrumb') {
+    if (event.type === 'breadcrumb' || event.type === 'performance') {
       return true;
     }
 
-    if (this._count <= 0) {
-      logger$4.warn("\u5F53\u524D\u53D1\u9001\u6B21\u6570\u5DF2\u7ECF\u7528\u5B8C");
+    if (this._max <= 0) {
+      logger$5.warn("\u5F53\u524D\u53D1\u9001\u6B21\u6570\u5DF2\u7ECF\u7528\u5B8C");
       return false;
     }
 
-    logger$4.log("\u5F53\u524D\u5269\u4F59\u53D1\u9001event\u6B21\u6570: " + this._count);
-    this._count = this._count - 1;
+    logger$5.log("\u5F53\u524D\u5269\u4F59\u53D1\u9001event\u6B21\u6570: " + this._max);
+    this._max = this._max - 1;
     return true;
   };
   /**
@@ -2483,7 +2571,7 @@ var BaseClient = function () {
     try {
       return this._integrations[integration.id] || null;
     } catch (_oO) {
-      logger$4.warn("Cannot retrieve integration " + integration.id + " from the current Client");
+      logger$5.warn("Cannot retrieve integration " + integration.id + " from the current Client");
       return null;
     }
   };
@@ -2547,7 +2635,7 @@ var BaseClient = function () {
     } // We prepare the result here with a resolved Event.
 
 
-    var result = SyncPromise$1.resolve(prepared); // This should be the last thing called, since we want that
+    var result = SyncPromise$2.resolve(prepared); // This should be the last thing called, since we want that
     // {@link Hub.addEventProcessor} gets the finished prepared event.
 
     if (finalScope) {
@@ -2629,12 +2717,12 @@ var BaseClient = function () {
 
   BaseClient.prototype._sendEvent = function (event) {
     // 这里处理拦截 event已经经过了common的处理
-    if (this._isProd() && this._devEnvHandle() && this._limitCount(event)) {
+    if (this._isProd() && this._devEnvHandle() && this._allowSent(event)) {
       this._getBackend().sendEvent(event);
     }
 
     if (this._isDebug()) {
-      logger$4.log('1', JSON.stringify(event));
+      logger$5.log(JSON.stringify(event, null, 2));
     }
   };
   /**
@@ -2659,10 +2747,10 @@ var BaseClient = function () {
     var beforeSend = this.getOptions().beforeSend;
 
     if (!this._isEnabled()) {
-      return SyncPromise$1.reject('SDK not enabled, will not send event.');
+      return SyncPromise$2.reject('SDK not enabled, will not send event.');
     }
 
-    return new SyncPromise$1(function (resolve, reject) {
+    return new SyncPromise$2(function (resolve, reject) {
       _this._prepareEvent(event, scope, hint).then(function (prepared) {
         if (prepared === null) {
           reject('An event processor returned null, will not send event.');
@@ -2682,14 +2770,14 @@ var BaseClient = function () {
         var beforeSendResult = beforeSend(prepared, hint);
 
         if (typeof beforeSendResult === 'undefined') {
-          logger$4.error('`beforeSend` method has to return `null` or a valid event.');
+          logger$5.error('`beforeSend` method has to return `null` or a valid event.');
         } else if (isThenable(beforeSendResult)) {
           _this._handleAsyncBeforeSend(beforeSendResult, resolve, reject);
         } else {
           finalEvent = beforeSendResult;
 
           if (finalEvent === null) {
-            logger$4.log('`beforeSend` returned `null`, will not send event.');
+            logger$5.log('`beforeSend` returned `null`, will not send event.');
             resolve(null);
             return;
           } // From here on we are really async
@@ -2747,7 +2835,7 @@ var NoopTransport = function () {
 
 
   NoopTransport.prototype.sendEvent = function (_) {
-    return SyncPromise$1.resolve({
+    return SyncPromise$2.resolve({
       reason: "NoopTransport: Event has been skipped",
       status: Status.Skipped
     });
@@ -2758,7 +2846,7 @@ var NoopTransport = function () {
 
 
   NoopTransport.prototype.close = function (_) {
-    return SyncPromise$1.resolve(true);
+    return SyncPromise$2.resolve(true);
   };
 
   return NoopTransport;
@@ -2799,7 +2887,7 @@ var BaseBackend = function () {
 
   BaseBackend.prototype.sendEvent = function (event) {
     this._transport.sendEvent(event).then(null, function (reason) {
-      logger$4.error("Error while sending event: " + reason);
+      logger$5.error("Error while sending event: " + reason);
     });
   };
   /**
@@ -2825,24 +2913,21 @@ var BaseBackend = function () {
 function initAndBind$1(clientClass, options) {
   // debug 开启
   if (options.isDebug === true) {
-    logger$4.enable();
+    logger$5.enable();
   }
 
-  var hub = getCurrentHub$6();
+  var hub = getCurrentHub$a();
   var client = new clientClass(options);
   hub.bindClient(client);
 }
 
 var PromiseBuffer = PromiseBuffer$1,
     BeidouError = BeidouError$1;
-var getCurrentHub$5 = getCurrentHub$6;
+var getCurrentHub$9 = getCurrentHub$a;
 /** Base Transport class implementation */
 
 var BaseTransport = function () {
   function BaseTransport() {
-    /**
-    * @deprecated
-    */
     this.url = '';
     /** A simple buffer holding all requests. */
 
@@ -2855,7 +2940,7 @@ var BaseTransport = function () {
 
 
   BaseTransport.prototype._getReportUrl = function () {
-    var client = getCurrentHub$5().getClient() || {
+    var client = getCurrentHub$9().getClient() || {
       getOptions: function getOptions() {
         return {
           projectId: '',
@@ -2940,6 +3025,7 @@ var BaseTransport = function () {
  * wx.onAppHide -> App.onHide 监听小程序切后台事件
  * wx.getLaunchOptionsSync -> App.onLaunch 获取小程序启动时的参数
  */
+
 var APP_LIFE_CYCLE = ['onLaunch', 'onShow'];
 var PAGE_LIFE_CYCLE = ['onLoad', 'onShow', 'onReady', 'onHide'];
 var mp;
@@ -3017,6 +3103,11 @@ var MP = function () {
     get: function get() {
       if (this._systemInfo) return this._systemInfo;
       this._systemInfo = this._context.getSystemInfoSync();
+
+      if (this._appName === 'my') {
+        this._systemInfo.SDKVersion = this._context.SDKVersion || '';
+      }
+
       return this._systemInfo;
     },
     enumerable: false,
@@ -3038,25 +3129,83 @@ var MP = function () {
     enumerable: false,
     configurable: true
   });
-  Object.defineProperty(MP.prototype, "networkInfo", {
-    get: function get() {
-      var self = this;
-      if (this._networkInfo) return this._networkInfo;
 
-      this._context.getNetworkType({
-        success: function success(res) {
-          self._networkInfo = {
-            signalStrength: res.signalStrength,
-            networkType: res.networkType
-          };
-        }
+  MP.prototype.networkInfo = function () {
+    return __awaiter(this, void 0, void 0, function () {
+      var self;
+
+      var _this = this;
+
+      return __generator(this, function (_a) {
+        self = this;
+        return [2
+        /*return*/
+        , new Promise(function (resolve, reject) {
+          _this._context.getNetworkType({
+            success: function success(res) {
+              self._networkInfo = {
+                signalStrength: res.signalStrength,
+                networkType: res.networkType
+              };
+              resolve(self._networkInfo);
+            },
+            fail: function fail(err) {
+              reject(err);
+            }
+          });
+        })];
       });
+    });
+  };
 
-      return;
-    },
-    enumerable: false,
-    configurable: true
-  });
+  MP.prototype.getVersionInfo = function () {
+    return __awaiter(this, void 0, void 0, function () {
+      return __generator(this, function (_a) {
+        return [2
+        /*return*/
+        , new Promise(function (resolve, reject) {
+          try {
+            if (typeof wx !== 'undefined') {
+              var accountInfo = wx.getAccountInfoSync();
+              resolve(accountInfo.miniProgram.version); // 小程序 appId
+            }
+
+            if (typeof swan !== 'undefined') {
+              var res = swan.getEnvInfoSync(); // 基础库 3.140.1 之前，无法判断接口是否调用失败
+              // 基础库 3.140.1 及以后，通过 instanceof 来判断接口是否调用失败
+
+              if (!(res instanceof Error)) {
+                resolve(res.env);
+              } else {
+                reject(res.message);
+              }
+            }
+
+            if (typeof tt !== 'undefined') {
+              var microapp = tt.getEnvInfoSync().microapp;
+              resolve(microapp.mpVersion);
+            }
+
+            if (typeof my !== 'undefined') {
+              my.getRunScene({
+                success: function success(result) {
+                  resolve(result.envVersion);
+                },
+                fail: function fail() {
+                  reject();
+                }
+              });
+            }
+
+            if (typeof qq !== 'undefined') {
+              resolve(qq.getEnvVersion());
+            }
+          } catch (error) {}
+        })];
+      });
+    });
+  };
+
   Object.defineProperty(MP.prototype, "sceneInfo", {
     get: function get() {
       return this._sceneInfo;
@@ -3095,6 +3244,16 @@ var MP = function () {
     enumerable: false,
     configurable: true
   });
+  Object.defineProperty(MP.prototype, "pageParams", {
+    get: function get() {
+      return this._pageParams;
+    },
+    set: function set(data) {
+      this._pageParams = data;
+    },
+    enumerable: false,
+    configurable: true
+  });
 
   MP.instance = function () {
     if (mp) return mp;
@@ -3105,8 +3264,10 @@ var MP = function () {
   return MP;
 }();
 
-var logger$3 = logger$4,
+var logger$4 = logger$5,
     parseRetryAfterHeader = parseRetryAfterHeader$1;
+var getCurrentHub$8 = getCurrentHub$a;
+var hub$4 = getCurrentHub$8();
 
 var RequestTransport = function (_super) {
   __extends(RequestTransport, _super);
@@ -3119,7 +3280,28 @@ var RequestTransport = function (_super) {
   }
 
   RequestTransport.prototype.sendEvent = function (event) {
-    var _this = this; // 429 Too Many Requests 表示在一定的时间内用户发送了太多的请求，即超出了“频次限制”。
+    var _this = this;
+
+    var _a, _b;
+
+    var client = getCurrentHub$8().getClient() || {
+      getOptions: function getOptions() {
+        return {
+          projectId: '',
+          isDebug: false
+        };
+      }
+    };
+    var isDebug = client.getOptions().isDebug;
+    var content = this.finalFomartData(event);
+
+    if (isDebug && ((_b = (_a = content === null || content === void 0 ? void 0 : content.request) === null || _a === void 0 ? void 0 : _a.headers) === null || _b === void 0 ? void 0 : _b.brand) === 'devtools') {
+      return Promise.reject({
+        event: event,
+        reason: "In the current development environment, exceptions are not reported",
+        status: -1
+      });
+    } // 429 Too Many Requests 表示在一定的时间内用户发送了太多的请求，即超出了“频次限制”。
 
 
     if (new Date(Date.now()) < this._disabledUntil) {
@@ -3130,7 +3312,6 @@ var RequestTransport = function (_super) {
       });
     }
 
-    var content = this.finalFomartData(event);
     var ctx = MP.instance().context;
     this.url = this._getReportUrl();
     return this._buffer.add(new Promise(function (resolve, reject) {
@@ -3140,8 +3321,16 @@ var RequestTransport = function (_super) {
         header: {
           'content-type': 'multipart/form-data; boundary=XXX'
         },
+        headers: {
+          'content-type': 'multipart/form-data; boundary=XXX'
+        },
         data: '\r\n--XXX' + '\r\nContent-Disposition: form-data; name="content"' + '\r\n' + '\r\n' + JSON.stringify(content) + '\r\n--XXX',
         success: function success(response) {
+          if (content.type === 'breadcrumb') {
+            // 行为轨迹上报成功清空缓存
+            hub$4.clearBreadcrumbs();
+          }
+
           var status = Status.fromHttpCode(response.status);
 
           if (status === Status.Success) {
@@ -3155,7 +3344,7 @@ var RequestTransport = function (_super) {
             var now = Date.now();
             var retryAfterHeader = response.headers.get('Retry-After');
             _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, retryAfterHeader));
-            logger$3.warn("Too many requests, backing off till: " + _this._disabledUntil);
+            logger$4.warn("Too many requests, backing off till: " + _this._disabledUntil);
           }
 
           reject(response);
@@ -3168,6 +3357,49 @@ var RequestTransport = function (_super) {
   };
 
   return RequestTransport;
+}(BaseTransport);
+
+var getCurrentHub$7 = getCurrentHub$a;
+var SyncPromise$1 = SyncPromise$2;
+var hub$3 = getCurrentHub$7();
+
+var MiddlewareTransport = function (_super) {
+  __extends(MiddlewareTransport, _super);
+
+  function MiddlewareTransport() {
+    return _super !== null && _super.apply(this, arguments) || this;
+  }
+
+  MiddlewareTransport.prototype.sendEvent = function (event) {
+    var type = event.type,
+        _a = event.request,
+        request = _a === void 0 ? {} : _a;
+    var logType = event.logType || '';
+    var _b = request.headers,
+        headers = _b === void 0 ? {} : _b;
+    var uuid = headers.uuid;
+
+    if (logType === 'breadcrumb') {
+      return this._buffer.add(new SyncPromise$1(function (resolve) {
+        var eventCopy = __assign({}, event);
+
+        delete eventCopy.projectId;
+        delete eventCopy.sdk;
+        delete eventCopy.request;
+        hub$3.addBreadcrumb(__assign({}, eventCopy));
+        resolve();
+      }));
+    } else {
+      if (type === 'reportBreadcrumb') {
+        event.type = 'breadcrumb';
+        console.log('行为轨迹上报成功：', uuid);
+      }
+
+      return new RequestTransport().sendEvent(event);
+    }
+  };
+
+  return MiddlewareTransport;
 }(BaseTransport);
 
 /**
@@ -3516,7 +3748,7 @@ var addExceptionMechanism = addExceptionMechanism$1,
     isErrorEvent = isErrorEvent$1,
     isEvent = isEvent$2,
     isPlainObject$1 = isPlainObject$2,
-    SyncPromise = SyncPromise$1;
+    SyncPromise = SyncPromise$2;
 /**
  * Builds and Event from a Exception
  * @hidden
@@ -3666,7 +3898,7 @@ var MiniProgramBackend = function (_super) {
 
 
   MiniProgramBackend.prototype._setupTransport = function () {
-    return new RequestTransport();
+    return new MiddlewareTransport();
   };
 
   return MiniProgramBackend;
@@ -3682,9 +3914,7 @@ var MiniProgramClient = function (_super) {
 
   function MiniProgramClient(options) {
     if (options === void 0) {
-      options = {
-        url: ''
-      };
+      options = {};
     }
 
     return _super.call(this, MiniProgramBackend, options) || this;
@@ -3694,11 +3924,11 @@ var MiniProgramClient = function (_super) {
 }(BaseClient);
 
 var SDK_NAME = 'mp_monitor';
-var SDK_VERSION = '0.0.1';
+var SDK_VERSION = '0.0.2';
 
 var uuid4$2 = uuid4$3,
-    logger$2 = logger$4;
-var getCurrentHub$4 = getCurrentHub$6,
+    logger$3 = logger$5;
+var getCurrentHub$6 = getCurrentHub$a,
     addGlobalEventProcessor = addGlobalEventProcessor$1;
 var uuid;
 
@@ -3723,16 +3953,19 @@ function parseData(data) {
 
 var Common = function () {
   function Common() {
+    var _this = this;
     /**
      * @inheritDoc
      */
+
+
     this.name = Common.id;
     /**
      * @inheritDoc
      */
 
     this.setupOnce = function () {
-      var client = getCurrentHub$4().getClient() || {
+      var client = getCurrentHub$6().getClient() || {
         getOptions: function getOptions() {
           return {
             projectId: ''
@@ -3741,48 +3974,81 @@ var Common = function () {
       };
       var projectId = client.getOptions().projectId;
       addGlobalEventProcessor(function (event) {
-        try {
-          event.projectId = projectId;
-          event.sdk = {
-            name: SDK_NAME,
-            version: SDK_VERSION
-          };
-          var mpInstance = MP.instance();
-          var systemInfo = mpInstance.systemInfo || '';
-          var networkInfo = mpInstance.networkInfo || '';
-          var sceneInfo = mpInstance.sceneInfo || '';
-          var userInfo = mpInstance.userInfo || '';
-          event.request = {
-            url: mpInstance.currentPage,
-            headers: {
-              appName: mpInstance.appName,
-              appVersion: systemInfo.version,
-              appSDKVersion: systemInfo.SDKVersion,
-              imei: singleUUID(),
-              uuid: singleUUID(),
-              pid: singleUUID(),
-              os: systemInfo.system.split(' ')[0],
-              osv: systemInfo.system.split(' ')[1],
-              device: systemInfo.model,
-              brand: systemInfo.brand,
-              benchmarkLevel: systemInfo.benchmarkLevel,
-              host: systemInfo.host,
-              apn: networkInfo !== '' ? networkInfo.networkType : '',
-              scene: sceneInfo !== '' ? sceneInfo.scene : '',
-              systemInfo: encodeURIComponent(JSON.stringify(systemInfo)),
-              userInfo: encodeURIComponent(JSON.stringify(userInfo)),
-              networkInfo: encodeURIComponent(JSON.stringify(networkInfo)),
-              sceneInfo: encodeURIComponent(JSON.stringify(sceneInfo))
-            }
-          };
-          event.apis && (event.apis = parseData(event.apis));
-          event.resources && (event.resources = parseData(event.resources));
-          event.performances && (event.performances = parseData(event.performances));
-        } catch (e) {
-          logger$2.warn('get commom error ');
-        }
+        return __awaiter(_this, void 0, void 0, function () {
+          var mpInstance, systemInfo, networkInfo, sceneInfo, userInfo, pageParams;
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                _a.trys.push([0, 2,, 3]);
 
-        return event;
+                event.projectId = projectId;
+                event.sdk = {
+                  name: SDK_NAME,
+                  version: SDK_VERSION
+                };
+                mpInstance = MP.instance();
+                systemInfo = mpInstance.systemInfo || '';
+                return [4
+                /*yield*/
+                , mpInstance.networkInfo()];
+
+              case 1:
+                networkInfo = _a.sent() || '';
+                sceneInfo = mpInstance.sceneInfo || {};
+                userInfo = mpInstance.userInfo || '';
+                pageParams = mpInstance.pageParams || {};
+
+                if (mpInstance.currentPage === pageParams.url) {
+                  sceneInfo = Object.assign(sceneInfo, {
+                    pageParams: pageParams
+                  });
+                }
+
+                event.request = {
+                  url: mpInstance.currentPage,
+                  headers: {
+                    appName: mpInstance.appName,
+                    appVersion: systemInfo.version,
+                    appSDKVersion: systemInfo.SDKVersion,
+                    imei: singleUUID(),
+                    uuid: singleUUID(),
+                    pid: singleUUID(),
+                    os: systemInfo.system.split(' ')[0],
+                    osv: systemInfo.system.split(' ')[1],
+                    device: systemInfo.model,
+                    brand: systemInfo.brand,
+                    benchmarkLevel: systemInfo.benchmarkLevel,
+                    host: systemInfo.host,
+                    apn: networkInfo !== '' ? networkInfo.networkType : '',
+                    scene: sceneInfo !== '' ? JSON.stringify(sceneInfo.scene) : '',
+                    systemInfo: encodeURIComponent(JSON.stringify(systemInfo)),
+                    userInfo: encodeURIComponent(JSON.stringify(userInfo)),
+                    networkInfo: encodeURIComponent(JSON.stringify(networkInfo)),
+                    sceneInfo: encodeURIComponent(JSON.stringify(sceneInfo))
+                  }
+                };
+                event.apis && (event.apis = parseData(event.apis));
+                event.resources && (event.resources = parseData(event.resources));
+                event.performances && (event.performances = parseData(event.performances));
+                event.exceptions && (event.exceptions = parseData(event.exceptions));
+                return [3
+                /*break*/
+                , 3];
+
+              case 2:
+                _a.sent();
+                logger$3.warn('get commom error ');
+                return [3
+                /*break*/
+                , 3];
+
+              case 3:
+                return [2
+                /*return*/
+                , event];
+            }
+          });
+        });
       });
     };
   }
@@ -3795,7 +4061,7 @@ var Common = function () {
   return Common;
 }();
 
-var logger$1 = logger$4,
+var logger$2 = logger$5,
     getFunctionName = getFunctionName$1,
     intercept = intercept$1;
 var handlers = {};
@@ -3825,7 +4091,7 @@ function instrument(type) {
       break;
 
     default:
-      logger$1.warn('unknown instrumentation type:', type);
+      logger$2.warn('unknown instrumentation type:', type);
   }
 }
 /**
@@ -3860,7 +4126,7 @@ function triggerHandlers(type, data) {
       try {
         handler(data);
       } catch (e) {
-        logger$1.error("Error while triggering instrumentation handler.\nType: " + type + "\nName: " + getFunctionName(handler) + "\nError: " + e);
+        logger$2.error("Error while triggering instrumentation handler.\nType: " + type + "\nName: " + getFunctionName(handler) + "\nError: " + e);
       }
     }
   } catch (e_1_1) {
@@ -3926,8 +4192,8 @@ function instrumentConsoleError() {
         args[_i] = arguments[_i];
       }
 
-      triggerHandlers('error', args);
-      return originalConsole.call(window.console, args);
+      triggerHandlers('error', __assign({}, args));
+      return originalConsole.call.apply(originalConsole, __spread([window.console], args));
     };
   });
 }
@@ -3940,6 +4206,7 @@ function instrumentResource(ctx) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       var originSuccess = downloadOptions.success;
       var originFail = downloadOptions.fail;
+      var startTimestamp = Date.now();
 
       downloadOptions.success = function (res) {
         if (originSuccess) {
@@ -3950,6 +4217,8 @@ function instrumentResource(ctx) {
           triggerHandlers('resource', {
             statusCode: res.statusCode,
             errMsg: res.errMsg,
+            startTimestamp: startTimestamp,
+            endTimestamp: Date.now(),
             url: downloadOptions.url || ''
           });
         }
@@ -3961,7 +4230,10 @@ function instrumentResource(ctx) {
         }
 
         triggerHandlers('resource', {
+          statusCode: -1,
           errMsg: error.errMsg,
+          startTimestamp: startTimestamp,
+          endTimestamp: Date.now(),
           url: downloadOptions.url || ''
         });
       };
@@ -3975,8 +4247,8 @@ var uuid4$1 = uuid4$3,
     getGlobalObject = getGlobalObject$1,
     repeatCheck = repeatCheck$1,
     isString = isString$1;
-var getCurrentHub$3 = getCurrentHub$6;
-var hub$2 = getCurrentHub$3();
+var getCurrentHub$5 = getCurrentHub$a;
+var hub$2 = getCurrentHub$5();
 var global$1 = getGlobalObject();
 var overtime = 10000;
 /**
@@ -4020,9 +4292,7 @@ var ApiError = function () {
       if (!handlerData.endTimestamp) return;
       if (!handlerData.response) handlerData.response = {
         statusCode: -1
-      }; // 过滤北斗域名和图片路径
-
-      if (_this._filterUrl(handlerData.url, handlerData.method)) return; // 处理重复请求
+      }; // 处理重复请求
 
       if (repeatCheck(handlerData.method, handlerData.url)) return;
       var apiVal = {
@@ -4030,7 +4300,7 @@ var ApiError = function () {
         method: isString(handlerData.method) ? handlerData.method.toUpperCase() : 'GET',
         url: _this._formatUrl(handlerData.url),
         statusCode: (_a = handlerData === null || handlerData === void 0 ? void 0 : handlerData.response) === null || _a === void 0 ? void 0 : _a.statusCode,
-        errMsg: (_b = handlerData === null || handlerData === void 0 ? void 0 : handlerData.error) === null || _b === void 0 ? void 0 : _b.errMsg,
+        errMsg: encodeURIComponent(JSON.stringify((_b = handlerData === null || handlerData === void 0 ? void 0 : handlerData.error) === null || _b === void 0 ? void 0 : _b.errMsg)),
         eventId: uuid4$1(),
         timestamp: Date.now()
       };
@@ -4038,6 +4308,25 @@ var ApiError = function () {
         apis: [apiVal],
         type: 'api'
       };
+      /**
+      * 根因分析：如果开启行为轨迹采集 & 高频异常主动上报行为轨迹日志
+      */
+      // const client: any = getCurrentHub().getClient()
+      // const options = client?.getOptions();
+      // if (options && options.reportBreadcrumb) {
+      //   let status = Status.fromHttpCode(handlerData.response.statusCode);
+      //   if (status === Status.Success && handlerData.url.includes('/common')) {
+      //     let { result = '' } = handlerData.response.data;
+      //     if (result) {
+      //       const ctx = MP.instance().context;
+      //       ctx.reportBreadcrumb();
+      //     }
+      //   }
+      // }
+      // if (handlerData.url.match(/newBehavior/)) {
+      //   // @ts-ignore 上报成功清空面包屑 
+      //   hub.clearBreadcrumbs();
+      // }
 
       if (handlerData.response.statusCode >= 400) {
         hub$2.captureEvent(__assign({}, payload));
@@ -4054,33 +4343,6 @@ var ApiError = function () {
         payload.apis[0].statusCode = 408;
         hub$2.captureEvent(__assign({}, payload));
       }
-    }; // 过滤url
-
-
-    this._filterUrl = function (url, method) {
-      if (url.match(/tzjybeidou\.58\.com/) && method === 'POST') {
-        // We will not create breadcrumbs for fetch requests that contain `beidou_key` (internal beidou requests)
-        return true;
-      }
-
-      if (url.match(/\.(png|jpe?g|gif)$/)) {
-        return true;
-      } // todo 本地请求不监听。
-
-
-      var client = hub$2.getClient();
-      var clientOptions = client ? client.getOptions() : {};
-      var temp = false;
-
-      if (clientOptions.denyUrls) {
-        clientOptions.denyUrls.forEach(function (item) {
-          if (url.match(item)) {
-            temp = true;
-          }
-        });
-      }
-
-      return temp;
     }; // 补全url
 
 
@@ -4103,9 +4365,9 @@ var ApiError = function () {
   return ApiError;
 }();
 
-var getCurrentHub$2 = getCurrentHub$6;
+var getCurrentHub$4 = getCurrentHub$a;
 var uuid4 = uuid4$3;
-var hub$1 = getCurrentHub$2();
+var hub$1 = getCurrentHub$4();
 
 var ResourceErrorIntegration = function () {
   function ResourceErrorIntegration() {
@@ -4150,8 +4412,8 @@ var ResourceErrorIntegration = function () {
   return ResourceErrorIntegration;
 }();
 
-var getCurrentHub$1 = getCurrentHub$6;
-var hub = getCurrentHub$1();
+var getCurrentHub$3 = getCurrentHub$a;
+var hub = getCurrentHub$3();
 
 var GlobalHandlers = function () {
   function GlobalHandlers() {
@@ -4201,6 +4463,8 @@ var GlobalHandlers = function () {
                 content = args[i].message.replace(/\n/g, " ");
                 stack = args[i].stack;
                 break;
+              } else if (_typeof(args[i]) === 'object') {
+                content += JSON.stringify(args[i]);
               } else {
                 content += args[i].toString();
               }
@@ -4227,7 +4491,20 @@ var GlobalHandlers = function () {
           exceptions: [exceptionVal],
           type: 'exception'
         };
-        hub.captureEvent(__assign({}, payload));
+        hub.captureEvent(__assign({}, payload)); // 同时上报行为轨迹
+
+        var event = {
+          exceptions: [{
+            content: errType,
+            contents: errType + ": " + content,
+            stacktrace: stack || args[0],
+            endTimestamp: Date.now(),
+            startTimestamp: Date.now()
+          }],
+          type: 'exception',
+          logType: 'breadcrumb'
+        };
+        hub.captureEvent(event);
       },
       type: 'error'
     });
@@ -4365,8 +4642,8 @@ var Span = function () {
 }();
 
 var isInstanceOf = isInstanceOf$1,
-    logger = logger$4;
-var getCurrentHub = getCurrentHub$6; // @ts-ignore
+    logger$1 = logger$5;
+var getCurrentHub$2 = getCurrentHub$a; // @ts-ignore
 
 var instance = null;
 
@@ -4376,7 +4653,7 @@ var Transaction = function (_super) {
   function Transaction(transactionContext, hub) {
     var _this = _super.call(this, transactionContext) || this;
 
-    _this._hub = getCurrentHub();
+    _this._hub = getCurrentHub$2();
 
     if (isInstanceOf(hub, Hub)) {
       _this._hub = hub;
@@ -4418,7 +4695,7 @@ var Transaction = function (_super) {
     var _this = this;
 
     if (!this.name) {
-      logger.warn('Transaction has no name, falling back to `<unlabeled transaction>`.');
+      logger$1.warn('Transaction has no name, falling back to `<unlabeled transaction>`.');
       this.name = '<unlabeled transaction>';
     }
 
@@ -4492,6 +4769,7 @@ function addAppContexts(transaction, beidouTimeLine) {
 }
 
 var vitals = null;
+var getCurrentHub$1 = getCurrentHub$a;
 
 var MPVitals = function () {
   function MPVitals() {
@@ -4521,11 +4799,16 @@ var MPVitals = function () {
               self._appLanch = {
                 layoutTime: date,
                 extra: {
-                  name: '初始化耗时',
+                  name: '首屏时间',
                   scene: info.scene
                 }
               };
               mpInstance.sceneInfo = info;
+              mpInstance.getVersionInfo().then(function (res) {
+                mpInstance.sceneInfo = Object.assign(mpInstance.sceneInfo, {
+                  mpVersion: res
+                });
+              });
             }
 
             if (name === 'onShow') {
@@ -4542,9 +4825,13 @@ var MPVitals = function () {
     this.interceptPage = function () {
       var self = _this;
       var isTaro = typeof process !== 'undefined' && typeof process.env !== 'undefined' && typeof process.env.TARO_ENV !== 'undefined' ? true : false;
-      var primaryPage = isTaro ? Component : Page;
+      var primaryPage = Page;
+      var client = getCurrentHub$1().getClient();
+      var options = client === null || client === void 0 ? void 0 : client.getOptions();
 
       if (isTaro) {
+        var primaryComponent_1 = Component;
+
         Component = function Component(obj) {
           PAGE_LIFE_CYCLE.forEach(function (name) {
             if (typeof obj.methods[name] === 'function') {
@@ -4555,20 +4842,60 @@ var MPVitals = function () {
               };
             }
           });
-          primaryPage && primaryPage.call(_this, obj);
-        };
-      } else {
-        Page = function Page(obj) {
-          PAGE_LIFE_CYCLE.forEach(function (name) {
-            var primaryHookFn = obj[name];
-
-            obj[name] = function (info) {
-              return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
-            };
-          });
-          primaryPage && primaryPage.call(_this, obj);
+          primaryComponent_1 && primaryComponent_1.call(_this, obj);
         };
       }
+
+      Page = function Page(obj) {
+        PAGE_LIFE_CYCLE.forEach(function (name) {
+          var primaryHookFn = obj[name];
+
+          obj[name] = function (info) {
+            return self.rewritePageLifeCycle(name, this, primaryHookFn, info);
+          };
+        }); // 上报函数执行轨迹
+
+        if (options && options.reportBreadcrumb) {
+          self.rewriteFunctionReportBreadcrumb(obj);
+        }
+
+        primaryPage && primaryPage.call(_this, obj);
+      };
+    }; // 页面记录函数调用轨迹
+
+
+    this.rewriteFunctionReportBreadcrumb = function (options) {
+      var mpInstance = MP.instance();
+
+      var _loop_1 = function _loop_1(opt) {
+        if (_typeof(options[opt] === "function") && opt !== 'data') {
+          var primaryHookFn_2 = options[opt];
+
+          options[opt] = function () {
+            var startTimestamp = Date.now();
+            var event = {
+              type: 'function',
+              logType: 'breadcrumb',
+              functions: [{
+                functionName: opt,
+                functionType: arguments[0] ? arguments[0].type : opt,
+                params: encodeURIComponent(JSON.stringify(arguments)),
+                url: mpInstance.currentPage,
+                startTimestamp: startTimestamp,
+                endTimestamp: Date.now()
+              }]
+            };
+            getCurrentHub$1().captureEvent(event);
+            return primaryHookFn_2 && primaryHookFn_2.apply(this, arguments);
+          };
+        }
+      };
+
+      for (var opt in options) {
+        _loop_1(opt);
+      }
+
+      return options;
     }; //@ts-ignore
 
 
@@ -4576,7 +4903,7 @@ var MPVitals = function () {
       "in": Date.now() || new Date().getTime()
     }; // @ts-ignore
 
-    this._appLanch = null;
+    this._appLanch = {};
     this._fpDown = false;
     this.interceptApp();
     this.interceptPage();
@@ -4584,11 +4911,19 @@ var MPVitals = function () {
 
   MPVitals.prototype.rewritePageLifeCycle = function (name, self, primaryHookFn, info) {
     var date = Date.now() || new Date().getTime();
+    var mpInstance = MP.instance();
     console.log("Page\uFF1A" + name + "_" + date);
     this.__TIMELINE__["Page_" + name] = date;
 
     if (name === 'onHide') {
       this.__TIMELINE__['Page_init'] = date;
+    }
+
+    if (name === 'onLoad') {
+      mpInstance.pageParams = {
+        url: mpInstance.currentPage,
+        query: info
+      };
     } //页面渲染完成上报性能数据
 
 
@@ -4648,7 +4983,7 @@ var MPTracing = function () {
 
   MPTracing.prototype._createRouteTransaction = function () {
     if (!this._getCurrentHub) {
-      logger$4.warn("hub \u5FC5\u987B\u5B58\u5728");
+      logger$5.warn("hub \u5FC5\u987B\u5B58\u5728");
       return undefined;
     }
 
@@ -4671,27 +5006,194 @@ var MPTracing = function () {
   return MPTracing;
 }();
 
+var getCurrentHub = getCurrentHub$a;
+var logger = logger$5;
+
+var Breadcrumbs = function () {
+  /**
+   * @inheritDoc
+   */
+  function Breadcrumbs(options) {
+    /**
+     * @inheritDoc
+     */
+    this.name = Breadcrumbs.id;
+    this._options = __assign({
+      request: true,
+      error: true,
+      resource: true,
+      "function": false
+    }, options);
+  }
+
+  Breadcrumbs.prototype.setupOnce = function () {
+    var _this = this;
+
+    var client = getCurrentHub().getClient();
+    var options = client === null || client === void 0 ? void 0 : client.getOptions();
+
+    if (options && !options.reportBreadcrumb) {
+      return false;
+    }
+
+    if (this._options.request) {
+      addInstrumentationHandler({
+        callback: function callback() {
+          var args = [];
+
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+          }
+
+          _this._xhrBreadcrumb.apply(_this, __spread(args));
+        },
+        type: 'request'
+      });
+    }
+
+    if (this._options.resource) {
+      addInstrumentationHandler({
+        callback: function callback() {
+          var args = [];
+
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+          }
+
+          _this._resourceBreadcrumb.apply(_this, __spread(args));
+        },
+        type: 'resource'
+      });
+    }
+
+    var reportBreadcrumb = function reportBreadcrumb() {
+      try {
+        var scope = getCurrentHub().getScope();
+        var breadcrumbs = (scope === null || scope === void 0 ? void 0 : scope.getBreadcrumb()) || [];
+
+        if (breadcrumbs.length) {
+          breadcrumbs = breadcrumbs.map(function (item) {
+            var type = item.type;
+
+            switch (type) {
+              case 'api_success':
+                item['logKey'] = 'apis';
+                break;
+
+              case 'resource_success':
+                item['logKey'] = 'resources';
+                break;
+
+              default:
+                item['logKey'] = type + "s";
+                break;
+            }
+
+            delete item.timestamp;
+            return item;
+          });
+          var event_1 = {
+            type: 'reportBreadcrumb',
+            breadcrumbs: breadcrumbs
+          };
+          getCurrentHub().captureEvent(event_1);
+        }
+      } catch (e) {
+        logger.warn('ErrorListener error');
+      }
+    };
+
+    var ctx = MP.instance().context; // 添加全局上报方法
+
+    ctx.reportBreadcrumb = reportBreadcrumb;
+  };
+
+  Breadcrumbs.prototype._xhrBreadcrumb = function (handlerData) {
+    if (!handlerData.endTimestamp) {
+      return;
+    } // We only capture complete, non-beidou requests
+
+
+    if (handlerData.__beidou_own_request__) {
+      return;
+    }
+
+    var method = handlerData.method,
+        url = handlerData.url,
+        response = handlerData.response,
+        data = handlerData.data,
+        startTimestamp = handlerData.startTimestamp,
+        endTimestamp = handlerData.endTimestamp;
+
+    try {
+      var event_2 = {
+        type: 'api',
+        logType: 'breadcrumb',
+        apis: [{
+          category: 'xhr',
+          method: method,
+          url: url,
+          response: response.data,
+          statusCode: response.statusCode,
+          params: data,
+          startTimestamp: startTimestamp,
+          endTimestamp: endTimestamp
+        }]
+      };
+
+      if (response.statusCode < 400) {
+        //正确的请求
+        event_2.type = 'api_success';
+      }
+
+      getCurrentHub().captureEvent(event_2);
+    } catch (e) {
+      console.warn('parse error' + e);
+    }
+  };
+  /**
+   * Creates breadcrumbs from resource API calls
+   */
+
+
+  Breadcrumbs.prototype._resourceBreadcrumb = function (handlerData) {
+    var event = {
+      type: 'resource',
+      logType: 'breadcrumb',
+      resources: [handlerData]
+    };
+    getCurrentHub().captureEvent(event);
+  };
+  /**
+   * @inheritDoc
+   */
+
+
+  Breadcrumbs.id = 'Breadcrumbs';
+  return Breadcrumbs;
+}();
+
 var initAndBind = initAndBind$1;
 /**
  * 内部插件集合, 暂时不考虑外部情况
  */
 
-var defaultIntegrations = [new Common(), new GlobalHandlers(), new ApiError(), new ResourceErrorIntegration(), new MPTracing() // 性能
-];
+var defaultIntegrations = [new Common(), new GlobalHandlers(), new ApiError(), new ResourceErrorIntegration(), new Breadcrumbs(), new MPTracing()];
 /**
  * Beidou初始化调用处理
  */
 
 function init(options) {
   if (options === void 0) {
-    options = {
-      url: ''
-    };
+    options = {};
   }
 
-  options.isDebug = true;
+  options.isDebug = options.isDebug || false;
   options.isProd = true;
-  options.defaultIntegrations = defaultIntegrations;
+  options.maxSendEvent = options.maxSendEvent || 200;
+  options.defaultIntegrations = defaultIntegrations; // 是否上报web端行为轨迹
+
+  options.reportBreadcrumb = options.reportBreadcrumb || false;
   initAndBind(MiniProgramClient, options);
 }
 

@@ -113,14 +113,12 @@ function instrumentRequest(ctx: object): void {
   });
 }
 
-
 /** JSDoc */
 function instrumentConsoleError(): void {
   intercept(window.console, 'error', (originalConsole: any): (...args: any) => void => function (...args: any): boolean {
+    triggerHandlers('error', { ...args});
 
-    triggerHandlers('error', args);
-
-    return originalConsole.call(window.console, args);
+    return originalConsole.call(window.console, ...args);
   });
 }
 
@@ -130,6 +128,7 @@ function instrumentResource(ctx: object): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const originSuccess = downloadOptions.success;
     const originFail = downloadOptions.fail;
+    const startTimestamp = Date.now();
 
     downloadOptions.success = (res: any) => {
       if (originSuccess) {
@@ -139,6 +138,8 @@ function instrumentResource(ctx: object): void {
         triggerHandlers('resource', {
           statusCode: res.statusCode,
           errMsg: res.errMsg,
+          startTimestamp,
+          endTimestamp: Date.now(),
           url: downloadOptions.url || ''
         });
       }
@@ -149,7 +150,10 @@ function instrumentResource(ctx: object): void {
         originFail(error);
       }
       triggerHandlers('resource', {
+        statusCode: -1,
         errMsg: error.errMsg,
+        startTimestamp,
+        endTimestamp: Date.now(),
         url: downloadOptions.url || ''
       });
     }

@@ -1,6 +1,6 @@
 import { getCurrentHub, Hub, Scope } from '../../hub';
 import { Breadcrumb, CaptureContext, Event, Transaction, TransactionContext } from '../../types';
-import { logger, isString, truncate,getGlobalObject } from '../../utils';
+import { isString, truncate,getGlobalObject } from '../../utils';
 
 /**
  * This calls a function on the current hub.
@@ -157,24 +157,23 @@ export function pageLoadTrace(metric: 'LOAD0' | 'LOAD1' | 'LOAD2', alias?: strin
 }
 
 /**
- * 添加客户端日志
+ * 添加客户端行为轨迹日志
  * @export
  * @param {Custom} data
  */
-export function addCustomBreadcrumb(text: string) {
+export function addCustomBreadcrumb(text: string):void {
   if (!isString(text)) {
     return;
   }
-  let content = truncate(text, 500);
+  const content = truncate(text, 500);
   const event: Event = {
-    type: 'breadcrumb',
-    breadcrumbs: [
+    type: 'custom',
+    logType: 'breadcrumb',
+    customs: [
       {
-        type: 'custom',
         text: encodeURIComponent(content),
       },
     ],
   };
   callOnHub<void>('captureEvent', event);
-  logger.log('2',event);
 }

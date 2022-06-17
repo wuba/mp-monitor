@@ -1,8 +1,15 @@
 declare interface IContext {
+  getEnvVersion(): unknown;
+  getEnvInfoSync();
+  getRunScene(arg0: { success(result: any): void; fail(): void; });
+  getAccountInfoSync();
   getSystemInfoSync: () => TSystemInfo,
   getUserInfo: (object: Object) => {}
   getNetworkType: (object: Object) => {},
-  request: (object: Object) => {}
+  request: (object: Object) => {};
+  reportBreadcrumb: () => void;
+  // 支付宝版本号
+  SDKVersion?: string;
 }
 
 declare var wx: IContext; //微信小程序

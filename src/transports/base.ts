@@ -8,9 +8,6 @@ const { getCurrentHub } = core;
 /** Base Transport class implementation */
 export abstract class BaseTransport implements Transport {
 
-  /**
- * @deprecated
- */
   public url: string = '';
   /** A simple buffer holding all requests. */
   protected readonly _buffer: utils.PromiseBuffer<Response> = new PromiseBuffer(30);
@@ -28,7 +25,7 @@ export abstract class BaseTransport implements Transport {
         }
       }
     };
-    const { url } = client.getOptions();
+    const { url }:any = client.getOptions();
     return url;
   }
 

@@ -392,7 +392,9 @@ export function intercept(source: { [key: string]: any }, name: string, replacem
     try {
       Object.defineProperties(source, {
         [name]: {
-          enumerable: false,
+          configurable: true,
+          enumerable: true,
+          writable: true,
           value: wrapped,
         },
       });
@@ -403,4 +405,11 @@ export function intercept(source: { [key: string]: any }, name: string, replacem
   } else {
     source[name] = wrapped;
   }
+}
+
+// 按照指定规则，过滤 object 中的相关值。类似 Array.filter
+export function objectFilter(obj : any , predicate: (key: string, value: unknown) => boolean) : Object {
+    return Object.keys(obj)
+      .filter( key => predicate(key, obj[key]) )
+      .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
 }

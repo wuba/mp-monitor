@@ -1,13 +1,35 @@
-import { Event, Response, Status, utils } from '../shared';
+import { Event, Response, Status, utils, core } from '../shared';
+import { TCommonInfo } from '../types/mp';
 import MP from '../mp';
 import { BaseTransport } from './base';
 
 const { logger, parseRetryAfterHeader } = utils;
+const { getCurrentHub } = core;
+const hub = getCurrentHub();
 
 export class RequestTransport extends BaseTransport {
   private _disabledUntil: Date = new Date(Date.now());
 
   public sendEvent(event: Event): PromiseLike<Response> {
+
+    const client = getCurrentHub().getClient() || {
+      getOptions() {
+        return {
+          projectId: '',
+          isDebug: false
+        };
+      },
+    };
+    const { isDebug } = client.getOptions();
+    const content: TCommonInfo = <TCommonInfo>this.finalFomartData(event);
+
+    if (isDebug && content?.request?.headers?.brand === 'devtools') {
+      return Promise.reject({
+        event,
+        reason: `In the current development environment, exceptions are not reported`,
+        status: -1,
+      });;
+    }
 
     // 429 Too Many Requests 表示在一定的时间内用户发送了太多的请求，即超出了“频次限制”。
     if (new Date(Date.now()) < this._disabledUntil) {
@@ -18,7 +40,6 @@ export class RequestTransport extends BaseTransport {
       });
     }
 
-    const content: object = this.finalFomartData(event);
     const ctx = MP.instance().context;
 
     this.url = this._getReportUrl();
@@ -31,12 +52,18 @@ export class RequestTransport extends BaseTransport {
           header: {
             'content-type': 'multipart/form-data; boundary=XXX'
           },
+          headers: { // 支付宝小程序兼容
+            'content-type': 'multipart/form-data; boundary=XXX'
+          },
           data: '\r\n--XXX' +
             '\r\nContent-Disposition: form-data; name="content"' +
             '\r\n' +
             '\r\n' + JSON.stringify(content) +
             '\r\n--XXX',
           success: (response: any) => {
+            if (content.type === 'breadcrumb') { // 行为轨迹上报成功清空缓存
+              hub.clearBreadcrumbs();
+            }
             const status = Status.fromHttpCode(response.status);
             if (status === Status.Success) {
               resolve({ status });

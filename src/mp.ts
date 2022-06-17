@@ -1,4 +1,4 @@
-import { TSystemInfo, TUserInfo, TNetworkInfo, TSceneInfo } from './types/mp';
+import { TSystemInfo, TUserInfo, TNetworkInfo, TSceneInfo, TPageParams } from './types/mp';
 
 /**
  * 应用级事件 基础库>2.1.2
@@ -21,6 +21,7 @@ export default class MP {
   private _networkInfo!: TNetworkInfo; //网络信息
   private _sceneInfo!: TSceneInfo; //场景信息
   private _indexPage!: string;
+  private _pageParams!: TPageParams; //进入当前页面的query参数
 
   constructor() { }
 
@@ -78,6 +79,10 @@ export default class MP {
     if (this._systemInfo) return this._systemInfo;
 
     this._systemInfo = this._context.getSystemInfoSync();
+
+    if (this._appName === 'my') {
+      this._systemInfo.SDKVersion = this._context.SDKVersion || '';
+    }
     return this._systemInfo;
   }
 
@@ -92,18 +97,63 @@ export default class MP {
     return;
   }
 
-  public get networkInfo() {
+  public async networkInfo() {
     let self = this;
-    if (this._networkInfo) return this._networkInfo;
-    this._context.getNetworkType({
-      success: function (res: TNetworkInfo) {
-        self._networkInfo = {
-          signalStrength: res.signalStrength,
-          networkType: res.networkType
-        };
+    return new Promise((resolve, reject) => {
+      this._context.getNetworkType({
+        success: function (res: TNetworkInfo) {
+          self._networkInfo = {
+            signalStrength: res.signalStrength,
+            networkType: res.networkType
+          };
+          resolve(self._networkInfo);
+        },
+        fail: function (err: any) {
+          reject(err);
+        }
+      });
+    })
+  }
+
+  public async getVersionInfo () {
+    return new Promise((resolve, reject) => {
+      try {
+        if (typeof wx !== 'undefined') {
+          const accountInfo = wx.getAccountInfoSync();
+          resolve(accountInfo.miniProgram.version) // 小程序 appId
+        }
+        if (typeof swan !== 'undefined') {
+          let res = swan.getEnvInfoSync();
+          // 基础库 3.140.1 之前，无法判断接口是否调用失败
+          // 基础库 3.140.1 及以后，通过 instanceof 来判断接口是否调用失败
+          if (!(res instanceof Error)) {
+            resolve(res.env)
+          }
+          else {
+            reject(res.message)
+          }
+        }
+        if (typeof tt !== 'undefined') {
+          const { microapp } = tt.getEnvInfoSync();
+          resolve(microapp.mpVersion)
+        }
+        if (typeof my !== 'undefined') {
+          my.getRunScene({
+            success(result) {
+              resolve(result.envVersion)
+            },
+            fail(){
+              reject()
+            }
+          })
+        }
+        if (typeof qq !== 'undefined') {
+          resolve(qq.getEnvVersion())
+        }
+      } catch (error) {
+
       }
-    });
-    return;
+    })
   }
 
   public get sceneInfo() {
@@ -131,6 +181,13 @@ export default class MP {
     } else {
       return this._indexPage;
     }
+  }
+
+  public get pageParams() {
+    return this._pageParams;
+  }
+  public set pageParams(data: TPageParams) {
+    this._pageParams = data;
   }
 
   static instance(): MP {

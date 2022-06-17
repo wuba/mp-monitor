@@ -5,7 +5,8 @@ import { isThenable, logger, normalize, SyncPromise, truncate, isDevHref } from 
 import { Backend, BackendClass } from './basebackend';
 import { IntegrationIndex, setupIntegrations } from './integration';
 
-const DEFAULT_MAX_COUNT = 25; // 限制当前页面最大上报量
+const DEFAULT_SEND_EVENT = 30; // 默认上报次数
+const MAX_ALLOW_SEND_EVENT = 500; // 允许上报的最大次数
 export abstract class BaseClient<B extends Backend, O extends Options> implements Client<O> {
   /**
    * The backend used to physically interact in the environment. Usually, this
@@ -23,7 +24,7 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
   /** Is the client still processing a call? */
   protected _processing: boolean = false;
 
-  private _count: number = DEFAULT_MAX_COUNT
+  private _max: number;
   /**
    * Initializes this client instance.
    *
@@ -32,6 +33,9 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
    */
   protected constructor(backendClass: BackendClass<B, O>, options: O) {
     this._backend = new backendClass(options);
+    const { maxSendEvent = DEFAULT_SEND_EVENT } = options;
+    this._max = Math.min(maxSendEvent, MAX_ALLOW_SEND_EVENT);
+
     this._options = options;
   }
 
@@ -54,30 +58,29 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
     return eventId;
   }
 
-  private _devEnvHandle () {
+  private _devEnvHandle() {
     if (isDevHref()) {
       logger.warn(`监控你在本地服务进行开发，不会进行北斗上报`);
-      return true
+      return true;
       // return false
     }
-    return true
+    return true;
   }
 
   // 上报前策略处理
-  private _limitCount (event: Event): boolean {
-    
+  private _allowSent(event: Event): boolean {
     // 面包屑没有参与统计
-    if (event.type === 'breadcrumb') {
+    if (event.type === 'breadcrumb' || event.type === 'performance') {
       return true
     }
 
-    if (this._count <= 0) {
+    if (this._max <= 0) {
       logger.warn(`当前发送次数已经用完`);
-      return false
+      return false;
     }
-    logger.log(`当前剩余发送event次数: ${this._count}`)
-    this._count = this._count - 1
-    return true
+    logger.log(`当前剩余发送event次数: ${this._max}`);
+    this._max = this._max - 1;
+    return true;
   }
 
   /**
@@ -93,16 +96,15 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
         eventId = finalEvent && finalEvent.event_id;
         this._processing = false;
       })
-      /* @ts-ignore */ 
+      /* @ts-ignore */
       .then(null, reason => {
         // TODO: 去掉 logger
         // logger.error(reason);
         this._processing = false;
-      })
+      });
 
     return eventId;
   }
-
 
   /**
    * @inheritDoc
@@ -110,7 +112,6 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
   public getOptions(): O {
     return this._options;
   }
-
 
   /**
    * Sets up the integrations
@@ -199,6 +200,7 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
       if (typeof normalizeDepth === 'number' && normalizeDepth > 0) {
         return this._normalizeEvent(evt, normalizeDepth);
       }
+
       return evt;
     });
   }
@@ -264,11 +266,11 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
    */
   public _sendEvent(event: Event): void {
     // 这里处理拦截 event已经经过了common的处理
-    if (this._isProd() && this._devEnvHandle() && this._limitCount(event)) {
+    if (this._isProd() && this._devEnvHandle() && this._allowSent(event)) {
       this._getBackend().sendEvent(event);
     }
     if (this._isDebug()) {
-      logger.log('1',JSON.stringify(event));
+      logger.log(JSON.stringify(event, null, 2));
     }
   }
 
@@ -322,7 +324,6 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
               resolve(null);
               return;
             }
-
             // From here on we are really async
             this._sendEvent(finalEvent);
             resolve(finalEvent);

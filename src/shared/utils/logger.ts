@@ -5,7 +5,7 @@ import { consoleSandbox, getGlobalObject } from './misc';
 const global = getGlobalObject<Window>();
 
 /** Prefix for logging strings */
-const PREFIX = 'Beidou Logger ';
+const PREFIX = 'MpMonitor Logger ';
 
 /** JSDoc */
 class Logger {

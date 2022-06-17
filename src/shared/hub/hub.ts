@@ -195,6 +195,34 @@ export class Hub implements HubInterface {
     top.scope.addBreadcrumb(finalBreadcrumb, Math.min(maxBreadcrumbs, MAX_BREADCRUMBS));
   }
 
+  /**
+   * @inheritDoc
+   * 获取面包屑
+   */
+  public getBreadcrumb(): Breadcrumb[] {
+    const top = this.getStackTop();
+
+    if (!top.scope || !top.client) {
+      return [];
+    }
+
+    return top.scope.getBreadcrumb();
+  }
+
+  /**
+   * @inheritDoc
+   * 清空面包屑
+   */
+  public clearBreadcrumbs(): void {
+    const top = this.getStackTop();
+
+    if (!top.scope || !top.client) {
+      return;
+    }
+
+    top.scope.clearBreadcrumbs();
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public setContext(name: string, context: { [key: string]: any } | null): void {
     const top = this.getStackTop();

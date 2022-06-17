@@ -1,7 +1,7 @@
 /*
  * @file 处理event公共信息
  * */
-import { API, core, Event, Integration, IPerformance, Resource, utils } from '../shared';
+import { API, core, Event, Exception, Integration, IPerformance, Resource, utils } from '../shared';
 
 import MP from '../mp';
 import { SDK_NAME, SDK_VERSION } from '../version';
@@ -49,7 +49,7 @@ export class Common implements Integration {
     };
     const { projectId } = client.getOptions();
 
-    addGlobalEventProcessor((event: Event) => {
+    addGlobalEventProcessor(async (event: Event) => {
       try {
         event.projectId = projectId;
         event.sdk = {
@@ -58,9 +58,13 @@ export class Common implements Integration {
         };
         let mpInstance = MP.instance();
         const systemInfo: any = mpInstance.systemInfo || '';
-        const networkInfo: any = mpInstance.networkInfo || '';
-        const sceneInfo: any = mpInstance.sceneInfo || '';
+        const networkInfo: any = await mpInstance.networkInfo() || '';
+        let sceneInfo: any = mpInstance.sceneInfo || {};
         const userInfo: any = mpInstance.userInfo || '';
+        const pageParams: any = mpInstance.pageParams || {};
+        if (mpInstance.currentPage === pageParams.url) {
+          sceneInfo = Object.assign(sceneInfo, { pageParams });
+        }
         event.request = {
           url: mpInstance.currentPage,
           headers: {
@@ -77,7 +81,7 @@ export class Common implements Integration {
             benchmarkLevel: systemInfo.benchmarkLevel, //设备性能等级（仅Android）
             host: systemInfo.host, //当前小程序运行的宿主环境
             apn: networkInfo !== '' ? networkInfo.networkType : '',
-            scene: sceneInfo !== '' ? sceneInfo.scene : '', //场景值
+            scene: sceneInfo !== '' ? JSON.stringify(sceneInfo.scene) : '', //场景值
             systemInfo: encodeURIComponent(JSON.stringify(systemInfo)), //系统信息
             userInfo: encodeURIComponent(JSON.stringify(userInfo)), //用户信息
             networkInfo: encodeURIComponent(JSON.stringify(networkInfo)), //网络信息
@@ -87,6 +91,7 @@ export class Common implements Integration {
         event.apis && (event.apis = parseData<API>(event.apis));
         event.resources && (event.resources = parseData<Resource>(event.resources));
         event.performances && (event.performances = parseData<IPerformance>(event.performances));
+        event.exceptions && (event.exceptions = parseData<Exception>(event.exceptions));
       } catch (e) {
         logger.warn('get commom error ');
       }
