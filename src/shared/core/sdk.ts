@@ -9,9 +9,7 @@ export function initAndBind<F extends Client, O extends Options>(clientClass: Cl
   if (options.isDebug === true) {
     logger.enable();
   }
-
   const hub = getCurrentHub();
   const client = new clientClass(options);
   hub.bindClient(client);
 }
-

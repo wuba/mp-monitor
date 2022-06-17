@@ -3923,8 +3923,8 @@ var MiniProgramClient = function (_super) {
   return MiniProgramClient;
 }(BaseClient);
 
-var SDK_NAME = 'mp_monitor';
-var SDK_VERSION = '0.0.2';
+var SDK_NAME = 'mp-monitor';
+var SDK_VERSION = '1.0.1';
 
 var uuid4$2 = uuid4$3,
     logger$3 = logger$5;

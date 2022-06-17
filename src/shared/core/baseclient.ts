@@ -200,7 +200,6 @@ export abstract class BaseClient<B extends Backend, O extends Options> implement
       if (typeof normalizeDepth === 'number' && normalizeDepth > 0) {
         return this._normalizeEvent(evt, normalizeDepth);
       }
-
       return evt;
     });
   }
