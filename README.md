@@ -7,9 +7,9 @@
 1. npm形式使用
 
 ```js
-npm i mp_monitor --save
+npm i @mpapp/monitor --save
 
-const mpMonitor = require('mp_monitor');
+const mpMonitor = require('@mpapp/monitor');
 mpMonitor.init({
   projectId: '',
   url: '', // 异常上报接口

@@ -1,5 +1,5 @@
 {
-  "name": "mp_monitor",
+  "name": "@mpapp/monitor",
   "version": "1.0.2",
   "description": "小程序监控sdk",
   "main": "dist/mp_monitor.min.js",
